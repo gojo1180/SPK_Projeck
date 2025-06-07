@@ -15,18 +15,27 @@ def register_user(db: Session, user: UserCreate):
     new_user = Pengguna(
         nama=user.nama,
         email=user.email,
-        password=hashed_password
+        password_hash=hashed_password,
+        fase_latihan=user.fase_latihan
     )
 
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
 
-    return {"success": True, "message": "Registrasi berhasil."}
+    return {
+        "success": True,
+        "message": "Registrasi berhasil.",
+        "data": new_user
+    }
 
 def login_user(db: Session, credentials: UserLogin):
     user = db.query(Pengguna).filter(Pengguna.email == credentials.email).first()
-    if not user or not pwd_context.verify(credentials.password, user.password):
+    if not user or not pwd_context.verify(credentials.password, user.password_hash):
         return {"success": False, "message": "Email atau password salah."}
-    
-    return {"success": True, "message": "Login berhasil.", "user_id": user.id_pengguna}
+
+    return {
+        "success": True,
+        "message": "Login berhasil.",
+        "data": user
+    }

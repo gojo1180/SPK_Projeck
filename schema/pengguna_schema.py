@@ -5,8 +5,9 @@ class UserBase(BaseModel):
 
 class UserCreate(BaseModel):
     nama: str
-    email: EmailStr
     password: str
+    email: str
+    fase_latihan: str 
 
 class UserLogin(BaseModel):
     email: EmailStr

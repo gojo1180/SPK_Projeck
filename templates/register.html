@@ -19,19 +19,28 @@
     <div id="app" class="w-full md:w-1/2 p-8 relative">
       <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Register</h2>
 
-      <form @submit.prevent="register" class="space-y-4">
-        <input v-model="nama" type="text" placeholder="Nama Lengkap"
-               class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required />
-        <input v-model="email" type="email" placeholder="Email"
-               class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required />
-        <input v-model="password" type="password" placeholder="Password"
-               class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required />
+<form @submit.prevent="register" class="space-y-4">
+  <input v-model="nama" type="text" placeholder="Nama Lengkap"
+         class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required />
+  <input v-model="email" type="email" placeholder="Email"
+         class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required />
+  <input v-model="password" type="password" placeholder="Password"
+         class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required />
 
-        <button type="submit"
-                class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300">
-          Register
-        </button>
-      </form>
+  <!-- Dropdown fase olahraga -->
+  <select v-model="fase_latihan"
+          class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+    <option disabled value="">Pilih Fase Latihan</option>
+    <option value="bulking">Bulking</option>
+    <option value="cutting">Cutting</option>
+    <option value="maintenance">Maintenance</option>
+  </select>
+
+  <button type="submit"
+          class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300">
+    Register
+  </button>
+</form>
 
       <p class="text-sm text-center mt-4 text-red-500" v-if="error">{{ error }}</p>
       <p class="text-sm text-center mt-6">
@@ -57,52 +66,55 @@
   </div>
 
   <script>
-    const { createApp } = Vue;
+  const { createApp } = Vue;
 
-    createApp({
-      data() {
-        return {
-          nama: "",
-          email: "",
-          password: "",
-          error: "",
-          showModal: false
-        };
-      },
-      methods: {
-        async register() {
-          this.error = "";
-          this.showModal = false;
+  createApp({
+    data() {
+      return {
+        nama: "",
+        email: "",
+        password: "",
+        fase_latihan: "",
+        error: "",
+        showModal: false
+      };
+    },
+    methods: {
+      async register() {
+        this.error = "";
+        this.showModal = false;
 
-          try {
-            const response = await fetch("http://localhost:8000/api/register", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                nama: this.nama,
-                email: this.email,
-                password: this.password
-              })
-            });
+        try {
+          const response = await fetch("http://localhost:8000/api/register", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              nama: this.nama,
+              email: this.email,
+              password: this.password,
+              fase_latihan: this.fase_latihan
+            })
+          });
 
-            const data = await response.json();
+          const data = await response.json();
 
-            if (!response.ok) {
-              this.error = data.detail || "Gagal melakukan registrasi.";
-            } else {
-              this.nama = "";
-              this.email = "";
-              this.password = "";
-              this.showModal = true;
-            }
-          } catch (err) {
-            this.error = "Terjadi kesalahan saat menghubungi server.";
+          if (!response.ok) {
+            this.error = data.detail || "Gagal melakukan registrasi.";
+          } else {
+            this.nama = "";
+            this.email = "";
+            this.password = "";
+            this.fase_latihan = "";
+            this.showModal = true;
           }
+        } catch (err) {
+          this.error = "Terjadi kesalahan saat menghubungi server.";
         }
       }
-    }).mount('#app');
-  </script>
+    }
+  }).mount('#app');
+</script>
 </body>
 </html>
