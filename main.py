@@ -20,6 +20,7 @@ app.add_middleware(
 
 app.include_router(admin_auth.router)
 app.include_router(admin_makanan.router) 
+app.include_router(admin_config.router) 
 
 @app.get("/")
 def read_root():
