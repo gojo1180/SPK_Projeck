@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from model import user, makanan, bmi, kriteria, hasil, admin, bobot_preferensi, nilai_gizi
-from routes.admin import admin_auth, admin_makanan
+from routes.admin import admin_auth, admin_makanan, admin_config
 
 from utils.DB import Base, engine
 
