@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div id="app" class="w-full max-w-md p-6 bg-white rounded-2xl shadow-lg">
+    <h2 class="text-2xl font-bold text-center mb-6">Register</h2>
+
+    <form @submit.prevent="register" class="space-y-4">
+      <input v-model="nama" type="text" placeholder="Nama Lengkap"
+             class="w-full p-2 border rounded" required />
+      <input v-model="email" type="email" placeholder="Email"
+             class="w-full p-2 border rounded" required />
+      <input v-model="password" type="password" placeholder="Password"
+             class="w-full p-2 border rounded" required />
+      <button type="submit"
+              class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">
+        Register
+      </button>
+    </form>
+
+    <p class="text-sm text-center mt-4 text-red-500" v-if="error">{{ error }}</p>
+    <p class="text-sm text-center mt-4 text-green-600" v-if="success">{{ success }}</p>
+
+    <p class="text-sm text-center mt-4">
+      Sudah punya akun?
+      <a href="login.html" class="text-blue-600 hover:underline">Login di sini</a>
+    </p>
+  </div>
+
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          nama: "",
+          email: "",
+          password: "",
+          error: "",
+          success: ""
+        };
+      },
+      methods: {
+        async register() {
+          this.error = "";
+          this.success = "";
+
+          try {
+            fetch("http://localhost:8000/api/register", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                nama: this.nama,
+                email: this.email,
+                password: this.password
+              })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              this.error = data.detail || "Gagal melakukan registrasi.";
+            } else {
+              this.success = data.message;
+              this.nama = "";
+              this.email = "";
+              this.password = "";
+            }
+          } catch (err) {
+            this.error = "Terjadi kesalahan saat menghubungi server.";
+          }
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>

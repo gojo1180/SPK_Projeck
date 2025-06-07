@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="w-full max-w-md p-6 bg-white rounded-2xl shadow-lg">
+    <h2 class="text-2xl font-bold text-center mb-6">Login</h2>
+    <form class="space-y-4" action="/login" method="POST">
+      <input type="email" name="email" placeholder="Email" class="w-full p-2 border rounded" required />
+      <input type="password" name="password" placeholder="Password" class="w-full p-2 border rounded" required />
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Login</button>
+    </form>
+    <p class="text-sm text-center mt-4">
+      Belum punya akun? <a href="register.html" class="text-blue-600 hover:underline">Daftar di sini</a>
+    </p>
+  </div>
+</body>
+</html>

@@ -10,8 +10,6 @@ class Pengguna(Base):
     nama = Column(String)
     email = Column(String)
     password = Column(String)
-    tipe_tubuh = Column(String)
-    fase_olahraga = Column(String)
 
     bmi = relationship("BMI", back_populates="pengguna")
     penilaian = relationship("Penilaian", back_populates="pengguna")
