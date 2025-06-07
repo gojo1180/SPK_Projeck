@@ -1,540 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GymMeal - Decision Support System for Gym Nutrition</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS -->
-    <style>
-        :root {
-            --primary-color: #4e73df;
-            --secondary-color: #2e59d9;
-            --dark-color: #2c3e50;
-            --light-color: #f8f9fc;
-        }
-        
-        body {
-            font-family: 'Nunito', sans-serif;
-            background-color: var(--light-color);
-        }
-        
-        .hero-section {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-            padding: 5rem 0;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==');
-        }
-        
-        .feature-icon {
-            font-size: 2.5rem;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
-        
-        .meal-card {
-            transition: transform 0.3s ease;
-            border: none;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .meal-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .meal-card img {
-            height: 200px;
-            object-fit: cover;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-            padding: 0.5rem 1.5rem;
-            font-weight: 600;
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--secondary-color);
-            border-color: var(--secondary-color);
-        }
-        
-        .testimonial-card {
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        .footer {
-            background-color: var(--dark-color);
-            color: white;
-        }
-        
-        .nav-pills .nav-link.active {
-            background-color: var(--primary-color);
-        }
-        
-        .nutri-badge {
-            background-color: #e9ecef;
-            color: var(--dark-color);
-            font-weight: 600;
-            padding: 0.35em 0.65em;
-            border-radius: 50rem;
-            margin-right: 0.5rem;
-            margin-bottom: 0.5rem;
-            display: inline-block;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - HealthyGym</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/833/833472.png" type="image/png" />
+
+  <!-- SplideJS Carousel -->
+  <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.3/dist/js/splide.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.3/dist/css/splide.min.css" />
 </head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="#">
-                <i class="fas fa-dumbbell me-2"></i>GymMeal
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#features">Features</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#how-it-works">How It Works</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#meal-plans">Meal Plans</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#testimonials">Testimonials</a>
-                    </li>
-                </ul>
-                <a href="#get-started" class="btn btn-primary ms-lg-3">Get Started</a>
-            </div>
-        </div>
-    </nav>
+<body class="bg-gray-50 text-gray-800 font-sans">
 
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="container position-relative">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <h1 class="display-4 fw-bold mb-4">Optimize Your Gym Nutrition</h1>
-                    <p class="lead mb-4">Our decision support system helps you find the perfect meal plan tailored to your fitness goals, dietary preferences, and body type.</p>
-                    <div class="d-flex flex-wrap gap-2 mb-4">
-                        <span class="nutri-badge"><i class="fas fa-bullseye me-1"></i> Muscle Gain</span>
-                        <span class="nutri-badge"><i class="fas fa-weight me-1"></i> Weight Loss</span>
-                        <span class="nutri-badge"><i class="fas fa-heartbeat me-1"></i> Maintenance</span>
-                        <span class="nutri-badge"><i class="fas fa-running me-1"></i> Endurance</span>
-                    </div>
-                    <a href="#get-started" class="btn btn-light btn-lg me-2">Get Personalized Plan</a>
-                    <a href="#how-it-works" class="btn btn-outline-light btn-lg">How It Works</a>
-                </div>
-                <div class="col-lg-6 d-none d-lg-block">
-                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Healthy Food" class="img-fluid rounded-3 shadow">
-                </div>
-            </div>
-        </div>
-    </section>
+  <!-- Navbar -->
+  <header class="bg-lime-500 shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center text-white">
+      <h1 class="text-2xl font-bold flex items-center gap-2">
+        <img src="https://cdn-icons-png.flaticon.com/512/833/833472.png" alt="Logo" class="w-6 h-6">
+        HealthyGym
+      </h1>
+      <nav class="hidden md:flex space-x-6 font-medium">
+        <a href="#" class="hover:text-lime-100">Home</a>
+        <a href="#" class="hover:text-lime-100">Program</a>
+        <a href="#" class="hover:text-lime-100">Makanan</a>
+        <a href="#" class="hover:text-lime-100">Kontak</a>
+      </nav>
+      <div class="md:hidden">
+        <button id="menuBtn" class="focus:outline-none">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div id="mobileMenu" class="md:hidden hidden px-4 pb-4 space-y-2 bg-lime-600">
+      <a href="#" class="block text-white hover:text-lime-100">Home</a>
+      <a href="#" class="block text-white hover:text-lime-100">Program</a>
+      <a href="#" class="block text-white hover:text-lime-100">Makanan</a>
+      <a href="#" class="block text-white hover:text-lime-100">Kontak</a>
+    </div>
+  </header>
 
-    <!-- Features Section -->
-    <section id="features" class="py-5 bg-white">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold">Why Choose GymMeal?</h2>
-                <p class="lead text-muted">Our system takes the guesswork out of gym nutrition</p>
-            </div>
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="text-center p-4">
-                        <div class="feature-icon">
-                            <i class="fas fa-robot"></i>
-                        </div>
-                        <h3 class="h4">Smart Algorithm</h3>
-                        <p class="text-muted">Our advanced algorithm analyzes your goals, body metrics, and preferences to recommend optimal meals.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="text-center p-4">
-                        <div class="feature-icon">
-                            <i class="fas fa-utensils"></i>
-                        </div>
-                        <h3 class="h4">Personalized Plans</h3>
-                        <p class="text-muted">Get meal plans tailored specifically for your dietary needs and fitness objectives.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="text-center p-4">
-                        <div class="feature-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <h3 class="h4">Progress Tracking</h3>
-                        <p class="text-muted">Monitor your nutrition and fitness progress with our integrated tracking system.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+  <!-- Hero Section -->
+  <section class="text-center py-16 px-4 bg-lime-50">
+    <h2 class="text-4xl font-bold mb-4 text-lime-600 animate-fade-in">Selamat Datang di HealthyGym!</h2>
+    <p class="text-lg text-gray-600 max-w-xl mx-auto animate-slide-up">
+      Platform cerdas untuk rekomendasi makanan sehat berdasarkan fase latihan gym-mu.
+    </p>
+    <a href="#rekomendasi"
+       class="mt-6 inline-block bg-lime-500 text-white py-2 px-6 rounded-full font-semibold shadow-md hover:bg-lime-600 transition duration-300">
+      Mulai Sekarang
+    </a>
+  </section>
 
-    <!-- How It Works Section -->
-    <section id="how-it-works" class="py-5 bg-light">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold">How It Works</h2>
-                <p class="lead text-muted">Get your personalized gym meal plan in 3 easy steps</p>
-            </div>
-            <div class="row g-4">
-                <div class="col-lg-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <span class="badge bg-primary rounded-circle mb-3" style="width: 50px; height: 50px; line-height: 50px; font-size: 1.25rem;">1</span>
-                            <h3 class="h4">Input Your Data</h3>
-                            <p class="text-muted">Tell us about your fitness goals, body metrics, dietary restrictions, and food preferences.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <span class="badge bg-primary rounded-circle mb-3" style="width: 50px; height: 50px; line-height: 50px; font-size: 1.25rem;">2</span>
-                            <h3 class="h4">Algorithm Analysis</h3>
-                            <p class="text-muted">Our system processes your information using advanced decision-making algorithms.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <span class="badge bg-primary rounded-circle mb-3" style="width: 50px; height: 50px; line-height: 50px; font-size: 1.25rem;">3</span>
-                            <h3 class="h4">Get Your Plan</h3>
-                            <p class="text-muted">Receive your customized meal plan with recipes, macros, and shopping lists.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+  <!-- Carousel -->
+  <section class="my-12 px-4 max-w-6xl mx-auto">
+  <div class="splide rounded-xl shadow-xl" id="carousel">
+    <div class="splide__track">
+      <ul class="splide__list">
+        <li class="splide__slide">
+          <img src="https://i.pinimg.com/736x/ff/5f/0b/ff5f0be30fad7b8c8ac82597d3b8ffb6.jpg" class="rounded-xl w-full h-[300px] object-cover" />
+        </li>
+        <li class="splide__slide">
+          <img src="https://assistinghands.com/44/wp-content/uploads/sites/69/2021/09/32225512_ingredients-for-the-healthy-foods-selection-the-concept-of-heal.jpg" class="rounded-xl w-full h-[300px] object-cover" />
+        </li>
+        <li class="splide__slide">
+          <img src="https://www.foodbusinessnews.net/ext/resources/2022/10/03/fresh-foods_AdobeStock_LEAD.jpeg?height=635&t=1664819046&width=1200" class="rounded-xl w-full h-[300px] object-cover" />
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
 
-    <!-- Meal Plans Section -->
-    <section id="meal-plans" class="py-5 bg-white">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold">Sample Meal Plans</h2>
-                <p class="lead text-muted">Tailored to different fitness goals</p>
-            </div>
-            
-            <ul class="nav nav-pills justify-content-center mb-4" id="mealPlanTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="bulking-tab" data-bs-toggle="pill" data-bs-target="#bulking" type="button" role="tab">Bulking</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="cutting-tab" data-bs-toggle="pill" data-bs-target="#cutting" type="button" role="tab">Cutting</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="maintenance-tab" data-bs-toggle="pill" data-bs-target="#maintenance" type="button" role="tab">Maintenance</button>
-                </li>
-            </ul>
-            
-            <div class="tab-content" id="mealPlanTabsContent">
-                <div class="tab-pane fade show active" id="bulking" role="tabpanel">
-                    <div class="row g-4">
-                        <div class="col-md-4">
-                            <div class="card meal-card h-100">
-                                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" class="card-img-top" alt="High-Protein Breakfast">
-                                <div class="card-body">
-                                    <h5 class="card-title">High-Protein Breakfast</h5>
-                                    <p class="card-text">Scrambled eggs with spinach, whole grain toast, and avocado.</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="badge bg-primary">650 kcal</span>
-                                        <span class="text-muted">45g protein</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card meal-card h-100">
-                                <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" class="card-img-top" alt="Muscle-Building Lunch">
-                                <div class="card-body">
-                                    <h5 class="card-title">Muscle-Building Lunch</h5>
-                                    <p class="card-text">Grilled chicken with quinoa, roasted vegetables, and olive oil dressing.</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="badge bg-primary">850 kcal</span>
-                                        <span class="text-muted">55g protein</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card meal-card h-100">
-                                <img src="https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" class="card-img-top" alt="Post-Workout Dinner">
-                                <div class="card-body">
-                                    <h5 class="card-title">Post-Workout Dinner</h5>
-                                    <p class="card-text">Salmon with sweet potato mash and steamed broccoli.</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="badge bg-primary">900 kcal</span>
-                                        <span class="text-muted">60g protein</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="tab-pane fade" id="cutting" role="tabpanel">
-                    <!-- Cutting meal plans would go here -->
-                    <div class="text-center py-4">
-                        <p>Low-calorie, high-protein meal options for fat loss while preserving muscle mass.</p>
-                    </div>
-                </div>
-                
-                <div class="tab-pane fade" id="maintenance" role="tabpanel">
-                    <!-- Maintenance meal plans would go here -->
-                    <div class="text-center py-4">
-                        <p>Balanced meals to maintain your current physique and performance.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Get Started Section -->
-    <section id="get-started" class="py-5 bg-primary text-white">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-8 text-center">
-                    <h2 class="fw-bold mb-4">Ready to Transform Your Nutrition?</h2>
-                    <p class="lead mb-5">Get your personalized gym meal plan today and take the guesswork out of your diet.</p>
-                    <div class="row g-3 justify-content-center">
-                        <div class="col-md-8 col-lg-6">
-                            <div class="card shadow">
-                                <div class="card-body p-4">
-                                    <h3 class="h5 mb-4 text-dark">Start Your Journey</h3>
-                                    <form>
-                                        <div class="mb-3">
-                                            <input type="email" class="form-control" placeholder="Your Email">
-                                        </div>
-                                        <div class="mb-3">
-                                            <select class="form-select">
-                                                <option selected>Select Your Primary Goal</option>
-                                                <option>Muscle Gain</option>
-                                                <option>Fat Loss</option>
-                                                <option>Maintenance</option>
-                                                <option>Endurance Training</option>
-                                            </select>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary w-100">Get My Plan</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+  <!-- Program Section -->
+  <section id="rekomendasi" class="py-12 bg-white px-4">
+    <h3 class="text-3xl font-bold text-center mb-8 text-lime-600">Rekomendasi Program</h3>
+    <div class="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+      <div class="bg-lime-100 p-6 rounded-xl shadow-md hover:shadow-xl transition transform hover:scale-105">
+        <h4 class="text-xl font-semibold text-lime-700 mb-2">Bulking</h4>
+        <p class="text-gray-700">Tingkatkan massa otot dengan asupan kalori tinggi dan nutrisi seimbang.</p>
+      </div>
+      <div class="bg-lime-100 p-6 rounded-xl shadow-md hover:shadow-xl transition transform hover:scale-105">
+        <h4 class="text-xl font-semibold text-lime-700 mb-2">Cutting</h4>
+        <p class="text-gray-700">Turunkan lemak tubuh tanpa kehilangan otot, dengan pola makan terkontrol.</p>
+      </div>
+      <div class="bg-lime-100 p-6 rounded-xl shadow-md hover:shadow-xl transition transform hover:scale-105">
+        <h4 class="text-xl font-semibold text-lime-700 mb-2">Maintenance</h4>
+        <p class="text-gray-700">Jaga performa dan berat badan ideal dengan pola makan seimbang dan rutin.</p>
+      </div>
+    </div>
+  </section>
 
-    <!-- Testimonials Section -->
-    <section id="testimonials" class="py-5 bg-light">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold">What Our Users Say</h2>
-                <p class="lead text-muted">Success stories from fitness enthusiasts</p>
-            </div>
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body p-4 testimonial-card">
-                            <div class="d-flex mb-3">
-                                <img src="https://randomuser.me/api/portraits/men/32.jpg" class="rounded-circle me-3" width="60" height="60" alt="User">
-                                <div>
-                                    <h5 class="mb-1">Michael R.</h5>
-                                    <p class="text-muted small">Bodybuilder</p>
-                                </div>
-                            </div>
-                            <p class="card-text">"GymMeal helped me break through my plateau by optimizing my nutrition for muscle growth. The meal plans are easy to follow and delicious!"</p>
-                            <div class="text-warning">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body p-4 testimonial-card">
-                            <div class="d-flex mb-3">
-                                <img src="https://randomuser.me/api/portraits/women/44.jpg" class="rounded-circle me-3" width="60" height="60" alt="User">
-                                <div>
-                                    <h5 class="mb-1">Sarah K.</h5>
-                                    <p class="text-muted small">Fitness Competitor</p>
-                                </div>
-                            </div>
-                            <p class="card-text">"The cutting meal plans helped me prepare for my competition while keeping me energized. I've never been so lean while still feeling strong!"</p>
-                            <div class="text-warning">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body p-4 testimonial-card">
-                            <div class="d-flex mb-3">
-                                <img src="https://randomuser.me/api/portraits/men/75.jpg" class="rounded-circle me-3" width="60" height="60" alt="User">
-                                <div>
-                                    <h5 class="mb-1">David L.</h5>
-                                    <p class="text-muted small">CrossFit Athlete</p>
-                                </div>
-                            </div>
-                            <p class="card-text">"As a CrossFit athlete, my nutrition needs are complex. GymMeal created a plan that supports my performance and recovery perfectly."</p>
-                            <div class="text-warning">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+  <!-- Footer -->
+  <footer class="bg-lime-600 text-white mt-12">
+    <div class="max-w-6xl mx-auto px-4 py-8 grid md:grid-cols-3 gap-6">
+      <div>
+        <h5 class="font-bold text-lg mb-2">HealthyGym</h5>
+        <p class="text-sm text-lime-100">Rekomendasi makanan sehat berbasis fase gym & tujuan kebugaranmu.</p>
+      </div>
+      <div>
+        <h5 class="font-bold mb-2">Navigasi</h5>
+        <ul class="text-sm space-y-1 text-lime-100">
+          <li><a href="#" class="hover:underline">Home</a></li>
+          <li><a href="#" class="hover:underline">Program</a></li>
+          <li><a href="#" class="hover:underline">Makanan</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 class="font-bold mb-2">Kontak</h5>
+        <p class="text-sm text-lime-100">Email: support@healthygym.com</p>
+        <p class="text-sm text-lime-100">Instagram: @healthygym</p>
+      </div>
+    </div>
+    <div class="text-center py-4 bg-lime-700 text-lime-100 text-sm">
+      &copy; 2025 HealthyGym. All rights reserved.
+    </div>
+  </footer>
 
-    <!-- FAQ Section -->
-    <section class="py-5 bg-white">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold">Frequently Asked Questions</h2>
-                <p class="lead text-muted">Find answers to common questions</p>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="accordion" id="faqAccordion">
-                        <div class="accordion-item border-0 shadow-sm mb-3">
-                            <h2 class="accordion-header" id="headingOne">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
-                                    How does the decision support system work?
-                                </button>
-                            </h2>
-                            <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Our system uses a multi-criteria decision-making algorithm that considers your fitness goals, body metrics, dietary restrictions, food preferences, and lifestyle to recommend optimal meal plans. It analyzes hundreds of variables to create personalized nutrition strategies.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item border-0 shadow-sm mb-3">
-                            <h2 class="accordion-header" id="headingTwo">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
-                                    Can I customize the meal plans?
-                                </button>
-                            </h2>
-                            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Absolutely! After receiving your initial recommendations, you can swap meals, adjust portion sizes, or exclude specific ingredients. Our system will recalculate the macros to keep you on track with your goals.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item border-0 shadow-sm">
-                            <h2 class="accordion-header" id="headingThree">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
-                                    How often should I update my plan?
-                                </button>
-                            </h2>
-                            <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    We recommend reassessing your plan every 4-6 weeks or whenever your goals, body composition, or training regimen changes significantly. The system can adapt to your progress to ensure continued results.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+  <!-- Animasi -->
+  <style>
+    .animate-fade-in {
+      animation: fadeIn 1s ease-out;
+    }
+    .animate-slide-up {
+      animation: slideUp 1s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 
-    <!-- Footer -->
-    <footer class="footer py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4 mb-lg-0">
-                    <h3 class="h5 mb-3"><i class="fas fa-dumbbell me-2"></i>GymMeal</h3>
-                    <p>The smart decision support system for gym nutrition. Helping athletes and fitness enthusiasts optimize their diets since 2023.</p>
-                    <div class="mt-4">
-                        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-youtube"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
-                    <h5 class="h6 mb-3">Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Home</a></li>
-                        <li class="mb-2"><a href="#features" class="text-white text-decoration-none">Features</a></li>
-                        <li class="mb-2"><a href="#how-it-works" class="text-white text-decoration-none">How It Works</a></li>
-                        <li class="mb-2"><a href="#meal-plans" class="text-white text-decoration-none">Meal Plans</a></li>
-                        <li><a href="#testimonials" class="text-white text-decoration-none">Testimonials</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
-                    <h5 class="h6 mb-3">Resources</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Blog</a></li>
-                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Nutrition Guides</a></li>
-                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Recipe Database</a></li>
-                        <li><a href="#" class="text-white text-decoration-none">FAQ</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h5 class="h6 mb-3">Contact Us</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> support@gymmeal.com</li>
-                        <li class="mb-2"><i class="fas fa-phone me-2"></i> +1 (555) 123-4567</li>
-                        <li><i class="fas fa-map-marker-alt me-2"></i> Fitness Street 123, Gym City</li>
-                    </ul>
-                </div>
-            </div>
-            <hr class="my-4 bg-secondary">
-            <div class="row align-items-center">
-                <div class="col-md-6 text-center text-md-start">
-                    <p class="small mb-0">&copy; 2023 GymMeal. All rights reserved.</p>
-                </div>
-                <div class="col-md-6 text-center text-md-end">
-                    <a href="#" class="text-white text-decoration-none small me-3">Privacy Policy</a>
-                    <a href="#" class="text-white text-decoration-none small">Terms of Service</a>
-                </div>
-            </div>
-        </div>
-    </footer>
+  <!-- Script -->
+  <script>
+    document.getElementById("menuBtn").addEventListener("click", () => {
+      const menu = document.getElementById("mobileMenu");
+      menu.classList.toggle("hidden");
+    });
 
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    new Splide('#carousel', {
+      type: 'loop',
+      autoplay: true,
+      interval: 3500,
+      perPage: 1,
+      pagination: false,
+      arrows: false,
+    }).mount();
+  </script>
 </body>
 </html>

@@ -7,16 +7,62 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div class="w-full max-w-md p-6 bg-white rounded-2xl shadow-lg">
-    <h2 class="text-2xl font-bold text-center mb-6">Login</h2>
-    <form class="space-y-4" action="/login" method="POST">
-      <input type="email" name="email" placeholder="Email" class="w-full p-2 border rounded" required />
-      <input type="password" name="password" placeholder="Password" class="w-full p-2 border rounded" required />
-      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Login</button>
-    </form>
-    <p class="text-sm text-center mt-4">
-      Belum punya akun? <a href="register.html" class="text-blue-600 hover:underline">Daftar di sini</a>
-    </p>
+  <div class="flex flex-col md:flex-row w-full max-w-4xl bg-white rounded-2xl shadow-lg overflow-hidden">
+    
+    <!-- Gambar Kiri -->
+    <div class="w-full md:w-1/2 h-48 md:h-auto bg-cover bg-center"
+         style="background-image: url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=800&q=80');">
+    </div>
+
+    <!-- Form Login -->
+    <div class="w-full md:w-1/2 p-8">
+      <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Login</h2>
+      
+      <form id="loginForm" class="space-y-4">
+        <input type="email" id="email" placeholder="Email"
+               class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required />
+        <input type="password" id="password" placeholder="Password"
+               class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required />
+        <button type="submit"
+                class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300">
+          Login
+        </button>
+      </form>
+
+      <p class="text-sm text-center mt-6">
+        Belum punya akun?
+        <a href="register.html" class="text-green-600 hover:underline font-medium">Daftar di sini</a>
+      </p>
+    </div>
   </div>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const response = await fetch("http://localhost:8000/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem("user_id", data.user_id);
+          window.location.href = "index.html";
+        } else {
+          alert(data.detail || "Login gagal.");
+        }
+      } catch (error) {
+        console.error("Login error:", error);
+        alert("Terjadi kesalahan. Periksa koneksi atau server.");
+      }
+    });
+  </script>
 </body>
 </html>

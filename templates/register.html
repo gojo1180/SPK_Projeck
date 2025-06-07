@@ -8,29 +8,52 @@
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div id="app" class="w-full max-w-md p-6 bg-white rounded-2xl shadow-lg">
-    <h2 class="text-2xl font-bold text-center mb-6">Register</h2>
+  <div class="flex flex-col md:flex-row w-full max-w-4xl bg-white rounded-2xl shadow-lg overflow-hidden">
+    
+    <!-- Gambar Kiri -->
+    <div class="w-full md:w-1/2 h-48 md:h-auto bg-cover bg-center"
+         style="background-image: url('https://www.garagegymreviews.com/wp-content/uploads/high-protein-vegetables.jpg');">
+    </div>
 
-    <form @submit.prevent="register" class="space-y-4">
-      <input v-model="nama" type="text" placeholder="Nama Lengkap"
-             class="w-full p-2 border rounded" required />
-      <input v-model="email" type="email" placeholder="Email"
-             class="w-full p-2 border rounded" required />
-      <input v-model="password" type="password" placeholder="Password"
-             class="w-full p-2 border rounded" required />
-      <button type="submit"
-              class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">
-        Register
-      </button>
-    </form>
+    <!-- Form Kanan -->
+    <div id="app" class="w-full md:w-1/2 p-8 relative">
+      <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Register</h2>
 
-    <p class="text-sm text-center mt-4 text-red-500" v-if="error">{{ error }}</p>
-    <p class="text-sm text-center mt-4 text-green-600" v-if="success">{{ success }}</p>
+      <form @submit.prevent="register" class="space-y-4">
+        <input v-model="nama" type="text" placeholder="Nama Lengkap"
+               class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required />
+        <input v-model="email" type="email" placeholder="Email"
+               class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required />
+        <input v-model="password" type="password" placeholder="Password"
+               class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required />
 
-    <p class="text-sm text-center mt-4">
-      Sudah punya akun?
-      <a href="login.html" class="text-blue-600 hover:underline">Login di sini</a>
-    </p>
+        <button type="submit"
+                class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300">
+          Register
+        </button>
+      </form>
+
+      <p class="text-sm text-center mt-4 text-red-500" v-if="error">{{ error }}</p>
+      <p class="text-sm text-center mt-6">
+        Sudah punya akun?
+        <a href="login.html" class="text-green-600 hover:underline font-medium">Login di sini</a>
+      </p>
+
+      <!-- ✅ Modal Sukses -->
+      <div v-if="showModal"
+           class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm">
+          <h2 class="text-xl font-semibold text-green-600 mb-2">Registrasi Berhasil!</h2>
+          <p class="text-gray-700 mb-4">Akun kamu berhasil dibuat. Silakan login untuk mulai menggunakan aplikasi.</p>
+          <div class="flex justify-end space-x-2">
+            <a href="login.html"
+               class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Login</a>
+            <button @click="showModal = false"
+                    class="px-4 py-2 border rounded hover:bg-gray-100 transition">Tutup</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -43,16 +66,16 @@
           email: "",
           password: "",
           error: "",
-          success: ""
+          showModal: false
         };
       },
       methods: {
         async register() {
           this.error = "";
-          this.success = "";
+          this.showModal = false;
 
           try {
-           const response = await fetch("http://localhost:8000/api/register", {
+            const response = await fetch("http://localhost:8000/api/register", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json"
@@ -69,10 +92,10 @@
             if (!response.ok) {
               this.error = data.detail || "Gagal melakukan registrasi.";
             } else {
-              this.success = data.message;
               this.nama = "";
               this.email = "";
               this.password = "";
+              this.showModal = true;
             }
           } catch (err) {
             this.error = "Terjadi kesalahan saat menghubungi server.";
