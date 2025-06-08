@@ -3,160 +3,443 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard - HealthyGym</title>
+  <title>HealthyGym - SPK Makanan Gym Enthusiast</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <style>
+    #hero-carousel {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
+    .hero-image {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+      z-index: 0;
+    }
 
-  <!-- Favicon -->
-  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/833/833472.png" type="image/png" />
+    .hero-image.active {
+      opacity: 1;
+      z-index: 10;
+    }
 
-  <!-- SplideJS Carousel -->
-  <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.3/dist/js/splide.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.3/dist/css/splide.min.css" />
+    .hero-overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 20;
+    }
+
+    .hero-content {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 30;
+      text-align: center;
+      color: white;
+    }
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans">
+<body class="bg-gray-50 text-gray-800" id="app">
+<!-- Navbar -->
+<nav class="bg-white shadow-md sticky top-0 z-50">
+  <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+    <!-- Logo -->
+    <h1 class="text-2xl font-bold text-green-600">HealthyGym</h1>
 
-  <!-- Navbar -->
-  <header class="bg-lime-500 shadow-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center text-white">
-      <h1 class="text-2xl font-bold flex items-center gap-2">
-        <img src="https://cdn-icons-png.flaticon.com/512/833/833472.png" alt="Logo" class="w-6 h-6">
-        HealthyGym
-      </h1>
-      <nav class="hidden md:flex space-x-6 font-medium">
-        <a href="#" class="hover:text-lime-100">Home</a>
-        <a href="#" class="hover:text-lime-100">Program</a>
-        <a href="#" class="hover:text-lime-100">Makanan</a>
-        <a href="#" class="hover:text-lime-100">Kontak</a>
-      </nav>
-      <div class="md:hidden">
-        <button id="menuBtn" class="focus:outline-none">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2"
-               viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 6h16M4 12h16M4 18h16"/>
-          </svg>
-        </button>
-      </div>
-    </div>
-    <div id="mobileMenu" class="md:hidden hidden px-4 pb-4 space-y-2 bg-lime-600">
-      <a href="#" class="block text-white hover:text-lime-100">Home</a>
-      <a href="#" class="block text-white hover:text-lime-100">Program</a>
-      <a href="#" class="block text-white hover:text-lime-100">Makanan</a>
-      <a href="#" class="block text-white hover:text-lime-100">Kontak</a>
-    </div>
-  </header>
+    <!-- Hamburger (mobile only) -->
+    <button id="nav-toggle" class="md:hidden focus:outline-none">
+      <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
 
-  <!-- Hero Section -->
-  <section class="text-center py-16 px-4 bg-lime-50">
-    <h2 class="text-4xl font-bold mb-4 text-lime-600 animate-fade-in">Selamat Datang di HealthyGym!</h2>
-    <p class="text-lg text-gray-600 max-w-xl mx-auto animate-slide-up">
-      Platform cerdas untuk rekomendasi makanan sehat berdasarkan fase latihan gym-mu.
-    </p>
-    <a href="#rekomendasi"
-       class="mt-6 inline-block bg-lime-500 text-white py-2 px-6 rounded-full font-semibold shadow-md hover:bg-lime-600 transition duration-300">
-      Mulai Sekarang
-    </a>
+    <!-- Nav Links -->
+    <ul id="nav-menu" class="hidden md:flex gap-6 items-center">
+      <li>
+        <a href="#"
+          class="relative px-4 py-2 text-gray-700 font-medium transition duration-300 transform hover:scale-105 hover:text-white hover:bg-green-600 rounded-lg">
+          Home
+        </a>
+      </li>
+      <li>
+        <a href="#"
+          class="relative px-4 py-2 text-gray-700 font-medium transition duration-300 transform hover:scale-105 hover:text-white hover:bg-green-600 rounded-lg">
+          Makanan
+        </a>
+      </li>
+      <li>
+        <a href="#"
+          class="relative px-4 py-2 text-gray-700 font-medium transition duration-300 transform hover:scale-105 hover:text-white hover:bg-green-600 rounded-lg">
+          Tentang
+        </a>
+      </li>
+      <li>
+        <a href="#"
+          class="relative px-4 py-2 text-gray-700 font-medium transition duration-300 transform hover:scale-105 hover:text-white hover:bg-green-600 rounded-lg">
+          Kontak
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <!-- Hero Carousel Fullscreen -->
+  <section id="hero-carousel">
+    <div class="hero-overlay"></div>
+    <div class="hero-content px-4">
+      <h2 class="text-4xl md:text-5xl font-bold mb-4">SPK Pemilihan Makanan Gym Enthusiast</h2>
+      <p class="text-lg md:text-xl mb-6 max-w-xl mx-auto">Bantu tubuhmu mencapai target yang ideal dengan memilih makanan sesuai fase latihan dan tujuan tubuhmu.</p>
+      <button class="bg-green-600 text-white py-2 px-6 rounded-full hover:bg-green-700 transition">Mulai Pilih Makanan</button>
+    </div>
   </section>
 
-  <!-- Carousel -->
-  <section class="my-12 px-4 max-w-6xl mx-auto">
-  <div class="splide rounded-xl shadow-xl" id="carousel">
-    <div class="splide__track">
-      <ul class="splide__list">
-        <li class="splide__slide">
-          <img src="https://i.pinimg.com/736x/ff/5f/0b/ff5f0be30fad7b8c8ac82597d3b8ffb6.jpg" class="rounded-xl w-full h-[300px] object-cover" />
-        </li>
-        <li class="splide__slide">
-          <img src="https://assistinghands.com/44/wp-content/uploads/sites/69/2021/09/32225512_ingredients-for-the-healthy-foods-selection-the-concept-of-heal.jpg" class="rounded-xl w-full h-[300px] object-cover" />
-        </li>
-        <li class="splide__slide">
-          <img src="https://www.foodbusinessnews.net/ext/resources/2022/10/03/fresh-foods_AdobeStock_LEAD.jpeg?height=635&t=1664819046&width=1200" class="rounded-xl w-full h-[300px] object-cover" />
-        </li>
-      </ul>
+<section class="py-12 bg-white">
+  <div class="text-center mb-10">
+    <h2 class="text-3xl font-bold">Our Healthy Menu</h2>
+  </div>
+  <div class="flex flex-wrap justify-center gap-8 px-6">
+    <!-- Card -->
+    <div class="relative rounded-2xl w-64 h-[400px] overflow-hidden group transition duration-300 hover:scale-105 shadow-lg hover:shadow-[0_10px_30px_-5px_rgba(34,197,94,0.7)] bg-white hover:bg-green-600">
+      <div class="flex justify-center mt-6 transition duration-300 group-hover:scale-110">
+        <img src="https://www.tasteofhome.com/wp-content/uploads/2018/01/Simple-Italian-Salad_EXPS_FT20_25957_F_0624_1-1.jpg" alt="Salad"
+          class="w-40 h-40 rounded-full object-cover ring-4 ring-white shadow-md">
+      </div>
+      <div class="mt-10 text-center px-4">
+        <h3 class="font-semibold text-xl text-gray-800 group-hover:text-white transition duration-300">
+          Fresh and Healthy Salad
+        </h3>
+      </div>
+    </div>
+
+    <!-- Duplikat untuk card lainnya -->
+    <div class="relative rounded-2xl w-64 h-[400px] overflow-hidden group transition duration-300 hover:scale-105 shadow-lg hover:shadow-[0_10px_30px_-5px_rgba(34,197,94,0.7)] bg-white hover:bg-green-600">
+      <div class="flex justify-center mt-6 transition duration-300 group-hover:scale-110">
+        <img src="https://inquiringchef.com/wp-content/uploads/2022/03/Thai-Cashew-Chicken_square-5166.jpg" alt="Salad"
+          class="w-40 h-40 rounded-full object-cover ring-4 ring-white shadow-md">
+      </div>
+      <div class="mt-10 text-center px-4">
+        <h3 class="font-semibold text-xl text-gray-800 group-hover:text-white transition duration-300">
+          Cashewnut Chicken Salad
+        </h3>
+      </div>
+    </div>
+
+       <div class="relative rounded-2xl w-64 h-[400px] overflow-hidden group transition duration-300 hover:scale-105 shadow-lg hover:shadow-[0_10px_30px_-5px_rgba(34,197,94,0.7)] bg-white hover:bg-green-600">
+      <div class="flex justify-center mt-6 transition duration-300 group-hover:scale-110">
+        <img src="https://i2.wp.com/www.downshiftology.com/wp-content/uploads/2014/08/Salmon-Avocado-Salad-5.jpg" alt="Salad"
+          class="w-40 h-40 rounded-full object-cover ring-4 ring-white shadow-md">
+      </div>
+      <div class="mt-10 text-center px-4">
+        <h3 class="font-semibold text-xl text-gray-800 group-hover:text-white transition duration-300">
+          Avocado Salmon Salad
+        </h3>
+      </div>
+    </div>
+
+     <div class="relative rounded-2xl w-64 h-[400px] overflow-hidden group transition duration-300 hover:scale-105 shadow-lg hover:shadow-[0_10px_30px_-5px_rgba(34,197,94,0.7)] bg-white hover:bg-green-600">
+      <div class="flex justify-center mt-6 transition duration-300 group-hover:scale-110">
+        <img src="https://fitfoodiefinds.com/wp-content/uploads/2021/01/ip-oatmealsq-1024x1024.jpg" alt="Salad"
+          class="w-40 h-40 rounded-full object-cover ring-4 ring-white shadow-md">
+      </div>
+      <div class="mt-10 text-center px-4">
+        <h3 class="font-semibold text-xl text-gray-800 group-hover:text-white transition duration-300">
+          Mixberry Oatmeal
+        </h3>
+      </div>
+    </div>
+
+     <div class="relative rounded-2xl w-64 h-[400px] overflow-hidden group transition duration-300 hover:scale-105 shadow-lg hover:shadow-[0_10px_30px_-5px_rgba(34,197,94,0.7)] bg-white hover:bg-green-600">
+      <div class="flex justify-center mt-6 transition duration-300 group-hover:scale-110">
+        <img src="https://gimmedelicious.com/wp-content/uploads/2021/09/Grilled-Salmon-with-avocado-Salsa-sq-750x750.jpg" alt="Salad"
+          class="w-40 h-40 rounded-full object-cover ring-4 ring-white shadow-md">
+      </div>
+      <div class="mt-10 text-center px-4">
+        <h3 class="font-semibold text-xl text-gray-800 group-hover:text-white transition duration-300">
+          Salmon Avocado Salsa
+        </h3>
+      </div>
+    </div>
+
+     <div class="relative rounded-2xl w-64 h-[400px] overflow-hidden group transition duration-300 hover:scale-105 shadow-lg hover:shadow-[0_10px_30px_-5px_rgba(34,197,94,0.7)] bg-white hover:bg-green-600">
+      <div class="flex justify-center mt-6 transition duration-300 group-hover:scale-110">
+        <img src="https://www.skinnytaste.com/wp-content/uploads/2015/01/Avocado-Toast-with-Egg-6.jpg" alt="Salad"
+          class="w-40 h-40 rounded-full object-cover ring-4 ring-white shadow-md">
+      </div>
+      <div class="mt-10 text-center px-4">
+        <h3 class="font-semibold text-xl text-gray-800 group-hover:text-white transition duration-300">
+          Egg and Toast Salad
+        </h3>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="py-16 bg-gray-50">
+  <div class="text-center mb-12">
+    <h2 class="text-3xl font-bold">WHY CHOOSE US?</h2>
+    <p class="text-gray-500 mt-2 max-w-xl mx-auto">
+      We help gym enthusiasts choose the healthiest food based on their workout phase and goals using a smart decision system.
+    </p>
+  </div>
+
+  <div class="flex flex-wrap justify-center gap-10 px-6">
+    <!-- Card 1 -->
+    <div class="relative w-72 h-[420px] bg-white rounded-2xl shadow-md p-6 text-center group transition duration-300 hover:scale-105 hover:bg-green-600 hover:shadow-[0_10px_30px_-5px_rgba(34,197,94,0.7)]">
+      <div class="text-green-600 text-6xl mb-6 transition duration-300 group-hover:text-white">
+        🥦 <!-- Ganti dengan ikon SVG jika perlu -->
+      </div>
+      <h3 class="text-xl font-semibold text-gray-800 group-hover:text-white transition duration-300">
+        Personalized Nutrition
+      </h3>
+      <p class="text-gray-500 group-hover:text-white text-sm mt-4 transition duration-300">
+        We recommend food tailored to your fitness phase: cutting, bulking, or maintenance.
+      </p>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="relative w-72 h-[420px] bg-white rounded-2xl shadow-md p-6 text-center group transition duration-300 hover:scale-105 hover:bg-green-600 hover:shadow-[0_10px_30px_-5px_rgba(34,197,94,0.7)]">
+      <div class="text-green-600 text-6xl mb-6 transition duration-300 group-hover:text-white">
+        📊
+      </div>
+      <h3 class="text-xl font-semibold text-gray-800 group-hover:text-white transition duration-300">
+        SMART Decision System
+      </h3>
+      <p class="text-gray-500 group-hover:text-white text-sm mt-4 transition duration-300">
+        Using SMART method, we calculate the best food options based on key health criteria.
+      </p>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="relative w-72 h-[420px] bg-white rounded-2xl shadow-md p-6 text-center group transition duration-300 hover:scale-105 hover:bg-green-600 hover:shadow-[0_10px_30px_-5px_rgba(34,197,94,0.7)]">
+      <div class="text-green-600 text-6xl mb-6 transition duration-300 group-hover:text-white">
+        ⚡
+      </div>
+      <h3 class="text-xl font-semibold text-gray-800 group-hover:text-white transition duration-300">
+        Easy & Fast Results
+      </h3>
+      <p class="text-gray-500 group-hover:text-white text-sm mt-4 transition duration-300">
+        Get food suggestions quickly in a modern, mobile-friendly interface built for everyone.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<section class="py-16 bg-gray-50">
+  <div class="text-center mb-8">
+    <h2 class="text-3xl font-bold">Makanan Sehat Populer</h2>
+    <p class="text-gray-500 mt-2 max-w-xl mx-auto">
+      Berikut beberapa makanan yang direkomendasikan berdasarkan fase olahraga dan tujuan tubuh Anda.
+    </p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="flex justify-center space-x-4 mb-8">
+    <button onclick="showTab('bulking')" class="tab-button bg-green-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-green-700 transition">Bulking</button>
+    <button onclick="showTab('cutting')" class="tab-button bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-gray-300 transition">Cutting</button>
+    <button onclick="showTab('maintenance')" class="tab-button bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-gray-300 transition">Maintenance</button>
+  </div>
+
+  <!-- Cards Container -->
+  <div id="foodsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 max-w-6xl mx-auto">
+    <!-- Card contoh -->
+    <div data-tab="bulking" class="card group bg-white rounded-2xl shadow-md overflow-hidden transition hover:bg-green-600 hover:scale-105 cursor-pointer">
+      <img src="https://assets.promediateknologi.id/crop/0x0:0x0/750x500/webp/photo/2022/03/26/953544907.jpeg" alt="Dada Ayam" class="w-full h-48 object-cover transition duration-300">
+      <div class="p-4 text-center">
+        <h3 class="text-xl font-bold text-gray-800 group-hover:text-white">Dada Ayam & Nasi Merah</h3>
+        <p class="text-gray-600 text-sm mt-2 group-hover:text-white">Sumber protein dan karbohidrat kompleks, cocok untuk fase bulking.</p>
+      </div>
+    </div>
+
+      <!-- Cards Bulking -->
+        <div data-tab="bulking" class="card group bg-white rounded-2xl shadow-md overflow-hidden transition hover:bg-green-600 hover:scale-105 cursor-pointer">
+      <img src="https://st4.depositphotos.com/2491621/40103/i/1600/depositphotos_401036096-stock-photo-roast-beef-sandwich-lettuce-tomato.jpg" alt="Sandwich Daging Sapi" class="w-full h-48 object-cover transition duration-300">
+      <div class="p-4 text-center">
+        <h3 class="text-xl font-bold text-gray-800 group-hover:text-white">Sandwich Daging Sapi </h3>
+        <p class="text-gray-600 text-sm mt-2 group-hover:text-white">Sumber protein dan karbohidrat kompleks, cocok untuk fase bulking.</p>
+      </div>
+    </div>
+
+            <div data-tab="bulking" class="card group bg-white rounded-2xl shadow-md overflow-hidden transition hover:bg-green-600 hover:scale-105 cursor-pointer">
+      <img src="https://media.post.rvohealth.io/wp-content/uploads/2025/02/sheet-pan-salmon-vegetables-quinoa-732-549-feature-thumb.jpg" alt="Ikan Salmon Panggang" class="w-full h-48 object-cover transition duration-300">
+      <div class="p-4 text-center">
+        <h3 class="text-xl font-bold text-gray-800 group-hover:text-white">Ikan Salmon Panggang </h3>
+        <p class="text-gray-600 text-sm mt-2 group-hover:text-white">Sumber protein dan karbohidrat kompleks, cocok untuk fase bulking.</p>
+      </div>
+    </div>
+      <!-- Cards Bulking -->
+
+    <!-- Cards Cutting -->
+    <div data-tab="cutting" class="card hidden group bg-white rounded-2xl shadow-md overflow-hidden transition hover:bg-green-600 hover:scale-105 cursor-pointer">
+      <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1" alt="Salad" class="w-full h-48 object-cover transition duration-300">
+      <div class="p-4 text-center">
+        <h3 class="text-xl font-bold text-gray-800 group-hover:text-white">Ayam Panggang </h3>
+        <p class="text-gray-600 text-sm mt-2 group-hover:text-white">Makanan rendah kalori, kaya serat, ideal untuk cutting.</p>
+      </div>
+    </div>
+
+        <div data-tab="cutting" class="card hidden group bg-white rounded-2xl shadow-md overflow-hidden transition hover:bg-green-600 hover:scale-105 cursor-pointer">
+      <img src="https://thefoodxp.com/wp-content/uploads/2020/12/Soft-Boiled-Eggs-1.jpg" alt="Salad" class="w-full h-48 object-cover transition duration-300">
+      <div class="p-4 text-center">
+        <h3 class="text-xl font-bold text-gray-800 group-hover:text-white">Telur Rebus</h3>
+        <p class="text-gray-600 text-sm mt-2 group-hover:text-white">Makanan rendah kalori, kaya serat, ideal untuk cutting.</p>
+      </div>
+    </div>
+
+        <div data-tab="cutting" class="card hidden group bg-white rounded-2xl shadow-md overflow-hidden transition hover:bg-green-600 hover:scale-105 cursor-pointer">
+      <img src="https://assets.promediateknologi.id/crop/0x0:0x0/750x500/webp/photo/2023/04/17/oatmeal-buah-3133597622.jpg" alt="Salad" class="w-full h-48 object-cover transition duration-300">
+      <div class="p-4 text-center">
+        <h3 class="text-xl font-bold text-gray-800 group-hover:text-white">Oatmeal Buah </h3>
+        <p class="text-gray-600 text-sm mt-2 group-hover:text-white">Makanan rendah kalori, kaya serat, ideal untuk cutting.</p>
+      </div>
+    </div>
+    <!-- Cards Cutting -->
+
+    <!-- Cards Maintenance -->
+    <div data-tab="maintenance" class="card hidden group bg-white rounded-2xl shadow-md overflow-hidden transition hover:bg-green-600 hover:scale-105 cursor-pointer">
+      <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c" alt="Oatmeal" class="w-full h-48 object-cover transition duration-300">
+      <div class="p-4 text-center">
+        <h3 class="text-xl font-bold text-gray-800 group-hover:text-white">Oatmeal dengan Buah</h3>
+        <p class="text-gray-600 text-sm mt-2 group-hover:text-white">Pilihan seimbang untuk mempertahankan massa otot dan energi.</p>
+      </div>
+    </div>
+
+      <div data-tab="maintenance" class="card hidden group bg-white rounded-2xl shadow-md overflow-hidden transition hover:bg-green-600 hover:scale-105 cursor-pointer">
+      <img src="https://cdn1-production-images-kly.akamaized.net/JUHURgi6TXBwVP0ty0ZLw74A2to=/1x89:1000x652/469x260/filters:quality(75):strip_icc():format(webp)/kly-media-production/medias/4664614/original/006150500_1701072643-shutterstock_346878119.jpg" alt="Oatmeal" class="w-full h-48 object-cover transition duration-300">
+      <div class="p-4 text-center">
+        <h3 class="text-xl font-bold text-gray-800 group-hover:text-white">Sup Ayam Nasi Merah & Brokoli </h3>
+        <p class="text-gray-600 text-sm mt-2 group-hover:text-white">Pilihan seimbang untuk mempertahankan massa otot dan energi.</p>
+      </div>
+    </div>
+
+      <div data-tab="maintenance" class="card hidden group bg-white rounded-2xl shadow-md overflow-hidden transition hover:bg-green-600 hover:scale-105 cursor-pointer">
+      <img src="https://ai-care.id/photos/Nutrisi/62f31525dfe0d.jpg" alt="Oatmeal" class="w-full h-48 object-cover transition duration-300">
+      <div class="p-4 text-center">
+        <h3 class="text-xl font-bold text-gray-800 group-hover:text-white">Kacang Kacangan </h3>
+        <p class="text-gray-600 text-sm mt-2 group-hover:text-white">Pilihan seimbang untuk mempertahankan massa otot dan energi.</p>
+      </div>
     </div>
   </div>
 </section>
 
+<section class="bg-white py-16">
+  <div class="text-center mb-12">
+    <h2 class="text-3xl font-bold">Statistik Pengguna</h2>
+    <p class="text-gray-500 mt-2 max-w-xl mx-auto">Kami terus berkembang dan dipercaya oleh pengguna aktif setiap harinya.</p>
+  </div>
 
-  <!-- Program Section -->
-  <section id="rekomendasi" class="py-12 bg-white px-4">
-    <h3 class="text-3xl font-bold text-center mb-8 text-lime-600">Rekomendasi Program</h3>
-    <div class="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-      <div class="bg-lime-100 p-6 rounded-xl shadow-md hover:shadow-xl transition transform hover:scale-105">
-        <h4 class="text-xl font-semibold text-lime-700 mb-2">Bulking</h4>
-        <p class="text-gray-700">Tingkatkan massa otot dengan asupan kalori tinggi dan nutrisi seimbang.</p>
+  <div class="flex flex-wrap justify-center gap-8 px-6">
+    <!-- CARD 1 -->
+    <div 
+      class="group stat-card w-64 h-44 bg-green-50 rounded-2xl shadow-md flex flex-col justify-center items-center transition duration-300 transform hover:scale-105 hover:bg-green-600 cursor-pointer"
+      data-aos="fade-up"
+      data-aos-delay="100"
+      data-target="312"
+    >
+      <h4 class="stat-number text-4xl font-bold text-green-600 transition duration-300 group-hover:text-white">0</h4>
+      <p class="mt-2 text-gray-600 transition duration-300 group-hover:text-white">Pengguna Aktif</p>
+    </div>
+
+    <!-- CARD 2 -->
+    <div 
+      class="group stat-card w-64 h-44 bg-green-50 rounded-2xl shadow-md flex flex-col justify-center items-center transition duration-300 transform hover:scale-105 hover:bg-green-600 cursor-pointer"
+      data-aos="fade-up"
+      data-aos-delay="200"
+      data-target="128"
+    >
+      <h4 class="stat-number text-4xl font-bold text-green-600 transition duration-300 group-hover:text-white">0</h4>
+      <p class="mt-2 text-gray-600 transition duration-300 group-hover:text-white">Rekomendasi Makanan</p>
+    </div>
+
+    <!-- CARD 3 -->
+    <div 
+      class="group stat-card w-64 h-44 bg-green-50 rounded-2xl shadow-md flex flex-col justify-center items-center transition duration-300 transform hover:scale-105 hover:bg-green-600 cursor-pointer"
+      data-aos="fade-up"
+      data-aos-delay="300"
+      data-target="96"
+      data-suffix="%"
+    >
+      <h4 class="stat-number text-4xl font-bold text-green-600 transition duration-300 group-hover:text-white">0</h4>
+      <p class="mt-2 text-gray-600 transition duration-300 group-hover:text-white">Tingkat Kepuasan</p>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-white text-gray-800 py-10 shadow-md border-t border-gray-200">
+  <div class="container mx-auto px-6 max-w-7xl">
+    <div class="flex flex-col sm:flex-row justify-between gap-10">
+      <!-- Logo & Description -->
+      <div class="sm:w-1/3">
+        <h2 class="text-2xl font-extrabold mb-3 tracking-wide select-none text-gray-900">HealthyGym</h2>
+        <p class="text-gray-600 text-sm leading-relaxed">
+          SPK Makanan Sehat untuk Gym Enthusiast — membantu Anda memilih makanan terbaik untuk mendukung performa dan hasil gym.
+        </p>
       </div>
-      <div class="bg-lime-100 p-6 rounded-xl shadow-md hover:shadow-xl transition transform hover:scale-105">
-        <h4 class="text-xl font-semibold text-lime-700 mb-2">Cutting</h4>
-        <p class="text-gray-700">Turunkan lemak tubuh tanpa kehilangan otot, dengan pola makan terkontrol.</p>
+
+      <!-- Kontak -->
+      <div class="sm:w-1/3 space-y-3">
+        <h3 class="font-semibold text-lg mb-2 uppercase tracking-wide text-gray-900">Kontak</h3>
+        <p class="hover:text-green-600 transition-transform transform hover:-translate-y-1 hover:scale-105 cursor-pointer text-gray-700">
+          Email: <a href="mailto:support@healthygym.com" class="underline hover:text-green-700">support@healthygym.com</a>
+        </p>
+        <p class="hover:text-green-600 transition-transform transform hover:-translate-y-1 hover:scale-105 cursor-pointer text-gray-700">
+          Telepon: <a href="tel:+6281234567890" class="underline hover:text-green-700">+62 812-3456-7890</a>
+        </p>
       </div>
-      <div class="bg-lime-100 p-6 rounded-xl shadow-md hover:shadow-xl transition transform hover:scale-105">
-        <h4 class="text-xl font-semibold text-lime-700 mb-2">Maintenance</h4>
-        <p class="text-gray-700">Jaga performa dan berat badan ideal dengan pola makan seimbang dan rutin.</p>
+
+      <!-- Sosial Media -->
+      <div class="sm:w-1/3">
+        <h3 class="font-semibold text-lg mb-4 uppercase tracking-wide text-gray-900">Sosial Media</h3>
+        <div class="flex space-x-6 justify-center sm:justify-start">
+          <!-- Facebook -->
+          <a href="#" aria-label="Facebook" 
+             class="text-gray-600 hover:text-green-600 transition-transform transform hover:rotate-6 hover:scale-110" 
+             style="perspective: 500px;">
+            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M22 12a10 10 0 10-11.5 9.9v-7h-2v-3h2v-2c0-2 1-3 3-3h2v3h-2c-.5 0-1 .5-1 1v1h3l-.5 3h-2.5v7A10 10 0 0022 12z" />
+            </svg>
+          </a>
+
+          <!-- Twitter -->
+          <a href="#" aria-label="Twitter"
+             class="text-gray-600 hover:text-green-600 transition-transform transform hover:-rotate-6 hover:scale-110" 
+             style="perspective: 500px;">
+            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M22.46 6c-.77.35-1.6.58-2.46.69a4.28 4.28 0 001.88-2.37 8.36 8.36 0 01-2.7 1.03 4.22 4.22 0 00-7.2 3.85A12 12 0 013 5.15a4.22 4.22 0 001.3 5.63 4.2 4.2 0 01-1.91-.53v.05a4.22 4.22 0 003.38 4.13 4.3 4.3 0 01-1.9.07 4.22 4.22 0 003.94 2.92A8.48 8.48 0 012 18.58a11.97 11.97 0 006.29 1.85c7.55 0 11.68-6.26 11.68-11.68 0-.18 0-.35-.01-.52A8.36 8.36 0 0022.46 6z"/>
+            </svg>
+          </a>
+
+          <!-- Instagram -->
+          <a href="#" aria-label="Instagram"
+             class="text-gray-600 hover:text-green-600 transition-transform transform hover:rotate-6 hover:scale-110" 
+             style="perspective: 500px;">
+            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 1.5A4.25 4.25 0 003.5 7.75v8.5A4.25 4.25 0 007.75 20.5h8.5a4.25 4.25 0 004.25-4.25v-8.5A4.25 4.25 0 0016.25 3.5h-8.5zm8.75 3.25a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0zm-4.25 1.25a5 5 0 110 10 5 5 0 010-10zm0 1.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7z"/>
+            </svg>
+          </a>
+        </div>
       </div>
     </div>
-  </section>
 
-  <!-- Footer -->
-  <footer class="bg-lime-600 text-white mt-12">
-    <div class="max-w-6xl mx-auto px-4 py-8 grid md:grid-cols-3 gap-6">
-      <div>
-        <h5 class="font-bold text-lg mb-2">HealthyGym</h5>
-        <p class="text-sm text-lime-100">Rekomendasi makanan sehat berbasis fase gym & tujuan kebugaranmu.</p>
-      </div>
-      <div>
-        <h5 class="font-bold mb-2">Navigasi</h5>
-        <ul class="text-sm space-y-1 text-lime-100">
-          <li><a href="#" class="hover:underline">Home</a></li>
-          <li><a href="#" class="hover:underline">Program</a></li>
-          <li><a href="#" class="hover:underline">Makanan</a></li>
-        </ul>
-      </div>
-      <div>
-        <h5 class="font-bold mb-2">Kontak</h5>
-        <p class="text-sm text-lime-100">Email: support@healthygym.com</p>
-        <p class="text-sm text-lime-100">Instagram: @healthygym</p>
-      </div>
+    <hr class="my-8 border-gray-300" />
+
+    <div class="text-center text-gray-500 text-sm select-none">
+      &copy; 2025 HealthyGym™. All Rights Reserved.
     </div>
-    <div class="text-center py-4 bg-lime-700 text-lime-100 text-sm">
-      &copy; 2025 HealthyGym. All rights reserved.
-    </div>
-  </footer>
+  </div>
+</footer>
 
-  <!-- Animasi -->
-  <style>
-    .animate-fade-in {
-      animation: fadeIn 1s ease-out;
-    }
-    .animate-slide-up {
-      animation: slideUp 1s ease-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-  </style>
 
-  <!-- Script -->
-  <script>
-    document.getElementById("menuBtn").addEventListener("click", () => {
-      const menu = document.getElementById("mobileMenu");
-      menu.classList.toggle("hidden");
-    });
-
-    new Splide('#carousel', {
-      type: 'loop',
-      autoplay: true,
-      interval: 3500,
-      perPage: 1,
-      pagination: false,
-      arrows: false,
-    }).mount();
-  </script>
 </body>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="/static/js/index.js"></script>
 </html>
