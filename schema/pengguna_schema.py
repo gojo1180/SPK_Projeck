@@ -8,7 +8,6 @@ class UserCreate(BaseModel):
     nama: str
     password: str
     email: EmailStr
-    fase_latihan: str  # wajib diisi saat register
 
 class UserLogin(BaseModel):
     email: EmailStr
@@ -19,7 +18,6 @@ class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
     password: Optional[str] = None
     fase_latihan: Optional[str] = None
-
 
 class UserResponse(UserBase):
     id_pengguna: int

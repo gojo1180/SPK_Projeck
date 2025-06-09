@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tentang Kami - HealthyGym</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3"></script>
+  <style>
+    /* Custom animation for dropdown */
+    .fade-slide-enter-active {
+      transition: all 0.3s ease;
+    }
+    .fade-slide-leave-active {
+      transition: all 0.3s ease;
+    }
+    .fade-slide-enter-from,
+    .fade-slide-leave-to {
+      transform: translateY(-10px);
+      opacity: 0;
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-800 font-sans">
+  <div id="app">
+   <!-- Navbar -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+      <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-green-600">HealthyGym</h1>
+
+        <!-- Toggle dropdown -->
+        <button @click="showMenu = !showMenu" class="md:hidden focus:outline-none">
+          <svg v-if="!showMenu" class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <svg v-else class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        <!-- Menu desktop -->
+        <ul class="hidden md:flex gap-6 items-center">
+          <li><a href="index.html" class="hover:text-green-600 font-medium">Home</a></li>
+          <li><a href="#" class="hover:text-green-600 font-medium">Makanan</a></li>
+          <li><a href="about us.html" class="hover:text-green-600 font-medium">Tentang</a></li>
+          <li><a href="contact.html" class="hover:text-green-600 font-medium">Kontak</a></li>
+          <li v-if="isLoggedIn"><a href="profile.html" class="hover:text-green-600 font-medium">Profile</a></li>
+          <li v-if="isLoggedIn"><button @click="logout" class="hover:text-green-600 font-medium">Logout</button></li>
+          <li v-else><a href="login.html" class="hover:text-green-600 font-medium">Login</a></li>
+        </ul>
+      </div>
+
+      <!-- Dropdown menu mobile -->
+      <transition name="fade-slide">
+        <ul v-show="showMenu" class="md:hidden px-4 pb-4 space-y-2">
+          <li><a href="index.html" class="block py-2 text-green-600">Home</a></li>
+          <li><a href="#" class="block py-2 text-green-600">Makanan</a></li>
+          <li><a href="about us.html" class="block py-2 text-green-600">Tentang</a></li>
+          <li><a href="contact.html" class="block py-2 text-green-600">Kontak</a></li>
+          <li v-if="isLoggedIn"><a href="profile.html" class="block py-2 text-green-600">Profile</a></li>
+          <li v-if="isLoggedIn"><button @click="logout" class="block py-2 text-green-600">Logout</button></li>
+          <li v-else><a href="login.html" class="block py-2 text-green-600">Login</a></li>
+        </ul>
+      </transition>
+    </nav>
+  </div>
+
+    <!-- About Section -->
+    <section class="py-20 px-6 md:px-20 text-center bg-gradient-to-b from-white to-green-50">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="text-4xl font-extrabold mb-6 text-green-600 tracking-tight">Tentang HealthyGym</h2>
+        <p class="text-gray-700 leading-relaxed text-lg mb-10">
+          HealthyGym adalah platform yang membantu Gym Enthusiast dalam memilih makanan sehat berdasarkan fase latihan seperti cutting, bulking, atau maintenance. Dengan menggunakan metode SMART, kami hadir untuk mendampingi perjalanan kebugaran Anda secara ilmiah dan terpersonalisasi.
+        </p>
+
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="bg-white shadow-xl rounded-2xl p-6 transform transition duration-300 hover:scale-105 hover:shadow-2xl">
+            <h3 class="text-xl font-bold text-green-600 mb-2">Misi Kami</h3>
+            <p class="text-gray-600 text-sm">
+              Memberikan rekomendasi makanan sehat berbasis data yang mendukung pertumbuhan dan performa optimal Anda.
+            </p>
+          </div>
+
+          <div class="bg-white shadow-xl rounded-2xl p-6 transform transition duration-300 hover:scale-105 hover:shadow-2xl">
+            <h3 class="text-xl font-bold text-green-600 mb-2">Teknologi SMART</h3>
+            <p class="text-gray-600 text-sm">
+              Menggunakan metode pengambilan keputusan multi-kriteria untuk menyaring makanan berdasarkan kebutuhan gym.
+            </p>
+          </div>
+
+          <div class="bg-white shadow-xl rounded-2xl p-6 transform transition duration-300 hover:scale-105 hover:shadow-2xl">
+            <h3 class="text-xl font-bold text-green-600 mb-2">Tim Kami</h3>
+            <p class="text-gray-600 text-sm">
+              Kami terdiri dari praktisi nutrisi, pengembang teknologi, dan pecinta gym yang berkomitmen untuk membuat hidup sehat lebih mudah.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+<footer class="bg-white text-gray-800 py-10 shadow-md border-t border-gray-200">
+  <div class="container mx-auto px-6 max-w-7xl">
+    <div class="flex flex-col sm:flex-row justify-between gap-10">
+      <!-- Logo & Description -->
+      <div class="sm:w-1/3">
+        <h2 class="text-2xl font-extrabold mb-3 tracking-wide select-none text-gray-900">HealthyGym</h2>
+        <p class="text-gray-600 text-sm leading-relaxed">
+          SPK Makanan Sehat untuk Gym Enthusiast — membantu Anda memilih makanan terbaik untuk mendukung performa dan hasil gym.
+        </p>
+      </div>
+
+      <!-- Kontak -->
+      <div class="sm:w-1/3 space-y-3">
+        <h3 class="font-semibold text-lg mb-2 uppercase tracking-wide text-gray-900">Kontak</h3>
+        <p class="hover:text-green-600 transition-transform transform hover:-translate-y-1 hover:scale-105 cursor-pointer text-gray-700">
+          Email: <a href="mailto:support@healthygym.com" class="underline hover:text-green-700">support@healthygym.com</a>
+        </p>
+        <p class="hover:text-green-600 transition-transform transform hover:-translate-y-1 hover:scale-105 cursor-pointer text-gray-700">
+          Telepon: <a href="tel:+6281234567890" class="underline hover:text-green-700">+62 812-3456-7890</a>
+        </p>
+      </div>
+
+      <!-- Sosial Media -->
+      <div class="sm:w-1/3">
+        <h3 class="font-semibold text-lg mb-4 uppercase tracking-wide text-gray-900">Sosial Media</h3>
+        <div class="flex space-x-6 justify-center sm:justify-start">
+          <!-- Facebook -->
+          <a href="#" aria-label="Facebook" 
+             class="text-gray-600 hover:text-green-600 transition-transform transform hover:rotate-6 hover:scale-110" 
+             style="perspective: 500px;">
+            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M22 12a10 10 0 10-11.5 9.9v-7h-2v-3h2v-2c0-2 1-3 3-3h2v3h-2c-.5 0-1 .5-1 1v1h3l-.5 3h-2.5v7A10 10 0 0022 12z" />
+            </svg>
+          </a>
+
+          <!-- Twitter -->
+          <a href="#" aria-label="Twitter"
+             class="text-gray-600 hover:text-green-600 transition-transform transform hover:-rotate-6 hover:scale-110" 
+             style="perspective: 500px;">
+            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M22.46 6c-.77.35-1.6.58-2.46.69a4.28 4.28 0 001.88-2.37 8.36 8.36 0 01-2.7 1.03 4.22 4.22 0 00-7.2 3.85A12 12 0 013 5.15a4.22 4.22 0 001.3 5.63 4.2 4.2 0 01-1.91-.53v.05a4.22 4.22 0 003.38 4.13 4.3 4.3 0 01-1.9.07 4.22 4.22 0 003.94 2.92A8.48 8.48 0 012 18.58a11.97 11.97 0 006.29 1.85c7.55 0 11.68-6.26 11.68-11.68 0-.18 0-.35-.01-.52A8.36 8.36 0 0022.46 6z"/>
+            </svg>
+          </a>
+
+          <!-- Instagram -->
+          <a href="#" aria-label="Instagram"
+             class="text-gray-600 hover:text-green-600 transition-transform transform hover:rotate-6 hover:scale-110" 
+             style="perspective: 500px;">
+            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 1.5A4.25 4.25 0 003.5 7.75v8.5A4.25 4.25 0 007.75 20.5h8.5a4.25 4.25 0 004.25-4.25v-8.5A4.25 4.25 0 0016.25 3.5h-8.5zm8.75 3.25a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0zm-4.25 1.25a5 5 0 110 10 5 5 0 010-10zm0 1.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <hr class="my-8 border-gray-300" />
+
+    <div class="text-center text-gray-500 text-sm select-none">
+      &copy; 2025 HealthyGym™. All Rights Reserved.
+    </div>
+  </div>
+</footer>
+</div>
+<script>
+const { createApp } = Vue;
+
+createApp({
+  data() {
+    return {
+      isLoggedIn: false,
+      showMenu: false, // ⬅️ ini penting
+    };
+  },
+  methods: {
+    checkSession() {
+      const user = localStorage.getItem("user");
+      this.isLoggedIn = !!user;
+    },
+
+    async login(email, password) {
+      try {
+        const response = await fetch("http://localhost:8000/api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ email, password })
+        });
+
+        if (!response.ok) {
+          throw new Error("Login gagal");
+        }
+
+        const data = await response.json();
+        localStorage.setItem("user", JSON.stringify(data));
+        this.isLoggedIn = true;
+        window.location.href = "/"; // redirect ke home setelah login
+      } catch (err) {
+        console.error("Login gagal:", err);
+      }
+    },
+
+    logout() {
+      localStorage.removeItem("user");
+      this.isLoggedIn = false;
+      window.location.href = "index.html";
+    }
+  },
+  mounted() {
+    this.checkSession();
+  }
+}).mount("#app");
+</script>
+
+
+</body>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="/static/js/index.js"></script>
+</html>

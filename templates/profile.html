@@ -8,196 +8,299 @@
   <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+  .fade-scale-enter-active,
+  .fade-scale-leave-active {
+    transition: all 0.2s ease-out;
+  }
+  .fade-scale-enter-from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  .fade-scale-enter-to {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .fade-scale-leave-from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .fade-scale-leave-to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-white text-gray-800 font-sans">
 
-  <div id="app">
-    <!-- Navbar -->
+<div id="app">
+   <!-- Navbar -->
     <nav class="bg-white shadow-md sticky top-0 z-50">
       <div class="container mx-auto px-4 py-4 flex items-center justify-between">
-        <!-- Logo -->
         <h1 class="text-2xl font-bold text-green-600">HealthyGym</h1>
 
-        <!-- Hamburger (Mobile only) -->
-        <button id="nav-toggle" class="md:hidden focus:outline-none">
-          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" stroke-width="2"
-            viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Toggle dropdown -->
+        <button @click="showMenu = !showMenu" class="md:hidden focus:outline-none">
+          <svg v-if="!showMenu" class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <svg v-else class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
 
-        <!-- Nav Links -->
-        <ul id="nav-menu" class="hidden md:flex gap-6 items-center">
-          <li><a href="index.html" class="nav-link text-gray-700 hover:text-green-600">Home</a></li>
-          <li><a href="#" class="nav-link text-gray-700 hover:text-green-600">Makanan</a></li>
-          <li><a href="#" class="nav-link text-gray-700 hover:text-green-600">Tentang</a></li>
-          <li><a href="#" class="nav-link text-gray-700 hover:text-green-600">Kontak</a></li>
-
-          <li v-if="user"><a href="profile.html" class="nav-link text-green-600 font-semibold">Profile</a></li>
-          <li v-if="user"><button @click="logout" class="nav-link text-red-600 hover:underline">Logout</button></li>
-          <li v-else><a href="login.html" class="nav-link text-green-600 hover:underline">Login</a></li>
+        <!-- Menu desktop -->
+        <ul class="hidden md:flex gap-6 items-center">
+          <li><a href="index.html" class="hover:text-green-600 font-medium">Home</a></li>
+          <li><a href="#" class="hover:text-green-600 font-medium">Makanan</a></li>
+          <li><a href="#" class="hover:text-green-600 font-medium">Tentang</a></li>
+          <li><a href="#" class="hover:text-green-600 font-medium">Kontak</a></li>
+          <li v-if="isLoggedIn"><a href="profile.html" class="hover:text-green-600 font-medium">Profile</a></li>
+          <li v-if="isLoggedIn"><button @click="logout" class="hover:text-green-600 font-medium">Logout</button></li>
+          <li v-else><a href="login.html" class="hover:text-green-600 font-medium">Login</a></li>
         </ul>
       </div>
+
+      <!-- Dropdown menu mobile -->
+      <transition name="fade-slide">
+        <ul v-show="showMenu" class="md:hidden px-4 pb-4 space-y-2">
+          <li><a href="index.html" class="block py-2 text-green-600">Home</a></li>
+          <li><a href="#" class="block py-2 text-green-600">Makanan</a></li>
+          <li><a href="#" class="block py-2 text-green-600">Tentang</a></li>
+          <li><a href="#" class="block py-2 text-green-600">Kontak</a></li>
+          <li v-if="isLoggedIn"><a href="profile.html" class="block py-2 text-green-600">Profile</a></li>
+          <li v-if="isLoggedIn"><button @click="logout" class="block py-2 text-green-600">Logout</button></li>
+          <li v-else><a href="login.html" class="block py-2 text-green-600">Login</a></li>
+        </ul>
+      </transition>
     </nav>
 
-    <!-- Profile Card -->
-    <div class="flex items-center justify-center p-4">
-      <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-6 mt-10">
-        <h2 class="text-3xl font-bold text-center text-green-600 mb-8">Profil Pengguna</h2>
 
-        <div v-if="error" class="mb-4 text-red-600 font-semibold text-center">
-          {{ error }}
+  <!-- Profile Section -->
+  <div class="flex items-center justify-center p-6">
+    <div class="w-full max-w-2xl bg-white shadow-xl rounded-2xl p-8 animate-fade-in">
+      <h2 class="text-3xl font-bold text-green-600 text-center mb-6">Profil Pengguna</h2>
+
+      <div class="flex justify-center mb-6">
+        <button @click="tab = 'profil'" :class="tab === 'profil' ? activeTabClass : inactiveTabClass">Profil</button>
+        <button @click="tab = 'password'" :class="tab === 'password' ? activeTabClass : inactiveTabClass">Ganti Password</button>
+      </div>
+
+      <!-- Error message -->
+      <div v-if="error" class="mb-4 text-red-600 font-semibold text-center">
+        {{ error }}
+      </div>
+
+      <!-- Update Profile -->
+      <form v-if="user && tab === 'profil'" @submit.prevent="updateUser" class="space-y-5">
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">Nama</label>
+          <input v-model="form.nama" type="text" required
+                 class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
         </div>
 
-        <form v-if="user" @submit.prevent="updateUser" class="space-y-6">
-          <div>
-            <label for="nama" class="block text-gray-700 font-medium mb-1">Nama</label>
-            <input id="nama" type="text" v-model="form.nama" required
-                   class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
-          </div>
-
-          <div>
-            <label for="email" class="block text-gray-700 font-medium mb-1">Email</label>
-            <input id="email" type="email" v-model="form.email" required
-                   class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
-          </div>
-
-          <div>
-            <label for="fase_latihan" class="block text-gray-700 font-medium mb-1">Fase Latihan</label>
-            <input id="fase_latihan" type="text" v-model="form.fase_latihan"
-                   class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
-          </div>
-
-          <button type="submit"
-                  :disabled="loading"
-                  class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
-            {{ loading ? 'Menyimpan...' : 'Perbarui Profil' }}
-          </button>
-        </form>
-
-        <div v-else class="text-center text-red-600 font-semibold">
-          <p>User belum login.</p>
-          <a href="login.html" class="text-blue-600 underline">Login di sini</a>
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">Email</label>
+          <input v-model="form.email" type="email" required
+                 class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
         </div>
+
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">Fase Latihan</label>
+          <select v-model="form.fase_latihan"
+                  class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+            <option disabled value="">Pilih Fase</option>
+            <option value="cutting">Cutting</option>
+            <option value="bulking">Bulking</option>
+            <option value="maintenance">Maintenance</option>
+          </select>
+        </div>
+
+        <button type="submit"
+                :disabled="loading"
+                class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ loading ? 'Menyimpan...' : 'Perbarui Profil' }}
+        </button>
+      </form>
+
+      <!-- Change Password Tab -->
+      <form v-if="user && tab === 'password'" @submit.prevent="changePassword" class="space-y-5">
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">Password Lama</label>
+          <input v-model="password.old" type="password" required
+                 class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">Password Baru</label>
+          <input v-model="password.new" type="password" required
+                 class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
+        </div>
+
+        <button type="submit"
+                class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+          Ganti Password
+        </button>
+      </form>
+
+      <div v-else-if="!user" class="text-center text-red-600 font-semibold mt-6">
+        <p>User belum login.</p>
+        <a href="login.html" class="text-blue-600 underline">Login di sini</a>
       </div>
     </div>
   </div>
+</div>
+  </div>
 
-  <script>
-    const { createApp } = Vue;
+<script>
+const { createApp } = Vue;
 
-    createApp({
-      data() {
-        return {
-          user: null,
-          form: {
-            nama: '',
-            email: '',
-            fase_latihan: '',
-          },
-          error: null,
-          loading: false
-        };
+createApp({
+  data() {
+    return {
+      user: null,
+      form: {
+        nama: '',
+        email: '',
+        fase_latihan: '',
       },
-      mounted() {
-        const userData = JSON.parse(localStorage.getItem("user"));
-        if (!userData || !userData.id_pengguna) {
-          this.showToast("User belum login atau data tidak ditemukan.", "error");
+      password: {
+        old: '',
+        new: '',
+      },
+      error: null,
+      loading: false,
+      showDropdown: false,
+      showMenu: false, // untuk toggle mobile menu (hamburger)
+      tab: 'profil',
+      isLoggedIn: false
+    };
+  },
+  computed: {
+    activeTabClass() {
+      return "px-4 py-2 font-semibold text-green-600 border-b-2 border-green-600";
+    },
+    inactiveTabClass() {
+      return "px-4 py-2 text-gray-600 hover:text-green-600";
+    }
+  },
+  mounted() {
+    this.checkSession();
+
+    // Deteksi klik luar nav untuk menutup dropdown desktop
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest("nav")) this.showDropdown = false;
+    });
+
+    // Ambil data user dari localStorage
+    const userData = JSON.parse(localStorage.getItem("user"));
+    if (!userData || !userData.id_pengguna) {
+      this.showToast("User belum login atau data tidak ditemukan.", "error");
+      return;
+    }
+
+    // Ambil data user dari API
+    fetch(`http://localhost:8000/api/pengguna/${userData.id_pengguna}`)
+      .then(res => {
+        if (!res.ok) throw new Error("Gagal mengambil data user.");
+        return res.json();
+      })
+      .then(data => {
+        this.user = data;
+        this.form.nama = data.nama || '';
+        this.form.email = data.email || '';
+        this.form.fase_latihan = data.fase_latihan || '';
+      })
+      .catch(err => {
+        this.showToast(err.message, "error");
+        console.error(err);
+      });
+  },
+  methods: {
+    checkSession() {
+      const user = localStorage.getItem("user");
+      this.isLoggedIn = !!user;
+    },
+    async updateUser() {
+      this.loading = true;
+      this.error = null;
+      const userData = JSON.parse(localStorage.getItem("user"));
+      if (!userData || !userData.id_pengguna) {
+        this.showToast("User belum login.", "error");
+        this.loading = false;
+        return;
+      }
+
+      const payload = {
+        nama: this.form.nama.trim(),
+        email: this.form.email.trim(),
+        fase_latihan: this.form.fase_latihan
+      };
+
+      try {
+        const response = await fetch(`http://localhost:8000/api/update/${userData.id_pengguna}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          const resData = await response.json();
+          this.showToast(resData.detail || "Gagal memperbarui data user.", "error");
           return;
         }
 
-        fetch(`http://localhost:8000/api/pengguna/${userData.id_pengguna}`)
-          .then(res => {
-            if (!res.ok) throw new Error("Gagal mengambil data user.");
-            return res.json();
-          })
-          .then(data => {
-            this.user = data;
-            this.form.nama = data.nama || '';
-            this.form.email = data.email || '';
-            this.form.fase_latihan = data.fase_latihan || '';
-          })
-          .catch(err => {
-            this.showToast(err.message, "error");
-            console.error(err);
-          });
-      },
-      methods: {
-        async updateUser() {
-          this.loading = true;
-          this.error = null;
-          const userData = JSON.parse(localStorage.getItem("user"));
-          if (!userData || !userData.id_pengguna) {
-            this.showToast("User belum login.", "error");
-            this.loading = false;
-            return;
-          }
-
-          const payload = {};
-          if (this.form.nama?.trim()) payload.nama = this.form.nama.trim();
-          if (this.form.email?.trim()) payload.email = this.form.email.trim();
-          if (this.form.fase_latihan?.trim()) payload.fase_latihan = this.form.fase_latihan.trim();
-
-          if (Object.keys(payload).length === 0) {
-            this.showToast("Tidak ada data yang diubah.", "warning");
-            this.loading = false;
-            return;
-          }
-
-          try {
-            const response = await fetch(`http://localhost:8000/api/update/${userData.id_pengguna}`, {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-              const resData = await response.json();
-              this.showToast(resData.detail || "Gagal memperbarui data user.", "error");
-              return;
-            }
-
-            this.user = await response.json();
-            this.showToast("Profil berhasil diperbarui!", "success");
-          } catch (err) {
-            this.showToast(err.message, "error");
-            console.error(err);
-          } finally {
-            this.loading = false;
-          }
-        },
-        logout() {
-          localStorage.removeItem("user");
-          window.location.href = "login.html";
-        },
-        showToast(message, type = "info") {
-          Toastify({
-            text: message,
-            duration: 3000,
-            gravity: "top",
-            position: "center",
-            backgroundColor:
-              type === "success"
-                ? "#16a34a"
-                : type === "error"
-                ? "#dc2626"
-                : "#facc15",
-          }).showToast();
-        }
+        this.user = await response.json();
+        this.showToast("Profil berhasil diperbarui!", "success");
+      } catch (err) {
+        this.showToast(err.message, "error");
+        console.error(err);
+      } finally {
+        this.loading = false;
       }
-    }).mount("#app");
-
-    // Toggle navbar mobile
-    document.addEventListener("DOMContentLoaded", () => {
-      const toggle = document.getElementById("nav-toggle");
-      const menu = document.getElementById("nav-menu");
-      if (toggle && menu) {
-        toggle.addEventListener("click", () => {
-          menu.classList.toggle("hidden");
-        });
+    },
+    changePassword() {
+      if (this.password.old && this.password.new) {
+        this.showToast("Password berhasil diubah!", "success");
+        this.password.old = '';
+        this.password.new = '';
+      } else {
+        this.showToast("Lengkapi kedua kolom password.", "error");
       }
-    });
-  </script>
+    },
+    logout() {
+      localStorage.removeItem("user");
+      this.isLoggedIn = false;
+      window.location.href = "index.html";
+    },
+    showToast(message, type = "info") {
+      Toastify({
+        text: message,
+        duration: 3000,
+        gravity: "top",
+        position: "center",
+        backgroundColor:
+          type === "success" ? "#16a34a" :
+          type === "error" ? "#dc2626" :
+          "#facc15"
+      }).showToast();
+    }
+  }
+}).mount("#app");
+</script>
+
+
+<style>
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out;
+}
+</style>
 
 </body>
 </html>

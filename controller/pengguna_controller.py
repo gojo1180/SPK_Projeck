@@ -17,7 +17,6 @@ def register_user(db: Session, user: UserCreate):
         nama=user.nama,
         email=user.email,
         password_hash=hashed_password,
-        fase_latihan=user.fase_latihan
     )
 
     db.add(new_user)
