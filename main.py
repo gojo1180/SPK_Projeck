@@ -1,9 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from model import user, makanan, bmi, kriteria, hasil, admin, bobot_preferensi, nilai_gizi
 from routes.admin import admin_auth, admin_makanan, admin_config
-
+from starlette.middleware.sessions import SessionMiddleware
 from utils.DB import Base, engine
 from routes import pengguna_routes
 from fastapi.staticfiles import StaticFiles
@@ -11,8 +10,10 @@ from fastapi.staticfiles import StaticFiles
 Base.metadata.create_all(bind=engine)
 
 
+
 app = FastAPI()
 
+# Gantilah secret_key ini dengan yang aman (acak & panjang)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(

@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div class="flex flex-col md:flex-row w-full max-w-4xl bg-white rounded-2xl shadow-lg overflow-hidden">
+  <div id="app" class="flex flex-col md:flex-row w-full max-w-4xl bg-white rounded-2xl shadow-lg overflow-hidden">
     
     <!-- Gambar Kiri -->
     <div class="w-full md:w-1/2 h-48 md:h-auto bg-cover bg-center"
@@ -18,10 +18,10 @@
     <div class="w-full md:w-1/2 p-8">
       <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Login</h2>
       
-      <form id="loginForm" class="space-y-4">
-        <input type="email" id="email" placeholder="Email"
+      <form @submit.prevent="login" class="space-y-4">
+        <input v-model="email" type="email" placeholder="Email"
                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required />
-        <input type="password" id="password" placeholder="Password"
+        <input v-model="password" type="password" placeholder="Password"
                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required />
         <button type="submit"
                 class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300">
@@ -36,33 +36,49 @@
     </div>
   </div>
 
+  <!-- Tambahkan Vue -->
+  <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
   <script>
-    document.getElementById("loginForm").addEventListener("submit", async function (e) {
-      e.preventDefault();
+    const { createApp } = Vue;
 
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+    createApp({
+      data() {
+        return {
+          email: "",
+          password: ""
+        };
+      },
+      methods: {
+        async login() {
+          try {
+            const response = await fetch("http://localhost:8000/api/login", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                email: this.email,
+                password: this.password
+              })
+            });
 
-      try {
-        const response = await fetch("http://localhost:8000/api/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        });
+            const data = await response.json();
 
-        const data = await response.json();
-
-        if (response.ok) {
-          localStorage.setItem("user_id", data.user_id);
-          window.location.href = "index.html";
-        } else {
-          alert(data.detail || "Login gagal.");
+            if (response.ok) {
+              // Simpan ke localStorage (bisa sesuaikan propertinya)
+              localStorage.setItem("user", JSON.stringify(data));
+              window.location.href = "index.html";
+            } else {
+              alert(data.detail || "Login gagal.");
+            }
+          } catch (error) {
+            console.error("Login error:", error);
+            alert("Terjadi kesalahan. Periksa koneksi atau server.");
+          }
         }
-      } catch (error) {
-        console.error("Login error:", error);
-        alert("Terjadi kesalahan. Periksa koneksi atau server.");
       }
-    });
+    }).mount("#app");
   </script>
 </body>
+
 </html>

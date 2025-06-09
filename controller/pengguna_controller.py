@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from model.user import Pengguna
-from schema.pengguna_schema import UserCreate, UserLogin
+from schema.pengguna_schema import UserCreate, UserLogin, UserUpdate
+from fastapi import HTTPException
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -39,3 +40,24 @@ def login_user(db: Session, credentials: UserLogin):
         "message": "Login berhasil.",
         "data": user
     }
+
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
+
+def update_user(db: Session, user_id: int, user_update: UserUpdate):
+    user = db.query(Pengguna).filter(Pengguna.id_pengguna == user_id).first()
+    if not user:
+        return {"success": False, "message": "User tidak ditemukan"}
+
+    data = user_update.dict(exclude_unset=True)  # ambil hanya field yg diisi
+
+    # Hapus password jika ada, agar tidak ikut diperbarui
+    data.pop("password", None)
+
+    for key, value in data.items():
+        setattr(user, key, value)
+
+    db.commit()
+    db.refresh(user)
+    return {"success": True, "data": user}
+

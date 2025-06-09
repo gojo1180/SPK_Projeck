@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profile</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <div id="app">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+      <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+        <!-- Logo -->
+        <h1 class="text-2xl font-bold text-green-600">HealthyGym</h1>
+
+        <!-- Hamburger (Mobile only) -->
+        <button id="nav-toggle" class="md:hidden focus:outline-none">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+        <!-- Nav Links -->
+        <ul id="nav-menu" class="hidden md:flex gap-6 items-center">
+          <li><a href="index.html" class="nav-link text-gray-700 hover:text-green-600">Home</a></li>
+          <li><a href="#" class="nav-link text-gray-700 hover:text-green-600">Makanan</a></li>
+          <li><a href="#" class="nav-link text-gray-700 hover:text-green-600">Tentang</a></li>
+          <li><a href="#" class="nav-link text-gray-700 hover:text-green-600">Kontak</a></li>
+
+          <li v-if="user"><a href="profile.html" class="nav-link text-green-600 font-semibold">Profile</a></li>
+          <li v-if="user"><button @click="logout" class="nav-link text-red-600 hover:underline">Logout</button></li>
+          <li v-else><a href="login.html" class="nav-link text-green-600 hover:underline">Login</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Profile Card -->
+    <div class="flex items-center justify-center p-4">
+      <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-6 mt-10">
+        <h2 class="text-3xl font-bold text-center text-green-600 mb-8">Profil Pengguna</h2>
+
+        <div v-if="error" class="mb-4 text-red-600 font-semibold text-center">
+          {{ error }}
+        </div>
+
+        <form v-if="user" @submit.prevent="updateUser" class="space-y-6">
+          <div>
+            <label for="nama" class="block text-gray-700 font-medium mb-1">Nama</label>
+            <input id="nama" type="text" v-model="form.nama" required
+                   class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
+          </div>
+
+          <div>
+            <label for="email" class="block text-gray-700 font-medium mb-1">Email</label>
+            <input id="email" type="email" v-model="form.email" required
+                   class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
+          </div>
+
+          <div>
+            <label for="fase_latihan" class="block text-gray-700 font-medium mb-1">Fase Latihan</label>
+            <input id="fase_latihan" type="text" v-model="form.fase_latihan"
+                   class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
+          </div>
+
+          <button type="submit"
+                  :disabled="loading"
+                  class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+            {{ loading ? 'Menyimpan...' : 'Perbarui Profil' }}
+          </button>
+        </form>
+
+        <div v-else class="text-center text-red-600 font-semibold">
+          <p>User belum login.</p>
+          <a href="login.html" class="text-blue-600 underline">Login di sini</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          user: null,
+          form: {
+            nama: '',
+            email: '',
+            fase_latihan: '',
+          },
+          error: null,
+          loading: false
+        };
+      },
+      mounted() {
+        const userData = JSON.parse(localStorage.getItem("user"));
+        if (!userData || !userData.id_pengguna) {
+          this.showToast("User belum login atau data tidak ditemukan.", "error");
+          return;
+        }
+
+        fetch(`http://localhost:8000/api/pengguna/${userData.id_pengguna}`)
+          .then(res => {
+            if (!res.ok) throw new Error("Gagal mengambil data user.");
+            return res.json();
+          })
+          .then(data => {
+            this.user = data;
+            this.form.nama = data.nama || '';
+            this.form.email = data.email || '';
+            this.form.fase_latihan = data.fase_latihan || '';
+          })
+          .catch(err => {
+            this.showToast(err.message, "error");
+            console.error(err);
+          });
+      },
+      methods: {
+        async updateUser() {
+          this.loading = true;
+          this.error = null;
+          const userData = JSON.parse(localStorage.getItem("user"));
+          if (!userData || !userData.id_pengguna) {
+            this.showToast("User belum login.", "error");
+            this.loading = false;
+            return;
+          }
+
+          const payload = {};
+          if (this.form.nama?.trim()) payload.nama = this.form.nama.trim();
+          if (this.form.email?.trim()) payload.email = this.form.email.trim();
+          if (this.form.fase_latihan?.trim()) payload.fase_latihan = this.form.fase_latihan.trim();
+
+          if (Object.keys(payload).length === 0) {
+            this.showToast("Tidak ada data yang diubah.", "warning");
+            this.loading = false;
+            return;
+          }
+
+          try {
+            const response = await fetch(`http://localhost:8000/api/update/${userData.id_pengguna}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+              const resData = await response.json();
+              this.showToast(resData.detail || "Gagal memperbarui data user.", "error");
+              return;
+            }
+
+            this.user = await response.json();
+            this.showToast("Profil berhasil diperbarui!", "success");
+          } catch (err) {
+            this.showToast(err.message, "error");
+            console.error(err);
+          } finally {
+            this.loading = false;
+          }
+        },
+        logout() {
+          localStorage.removeItem("user");
+          window.location.href = "login.html";
+        },
+        showToast(message, type = "info") {
+          Toastify({
+            text: message,
+            duration: 3000,
+            gravity: "top",
+            position: "center",
+            backgroundColor:
+              type === "success"
+                ? "#16a34a"
+                : type === "error"
+                ? "#dc2626"
+                : "#facc15",
+          }).showToast();
+        }
+      }
+    }).mount("#app");
+
+    // Toggle navbar mobile
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggle = document.getElementById("nav-toggle");
+      const menu = document.getElementById("nav-menu");
+      if (toggle && menu) {
+        toggle.addEventListener("click", () => {
+          menu.classList.toggle("hidden");
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>HealthyGym - SPK Makanan Gym Enthusiast</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <style>
     #hero-carousel {
@@ -45,8 +46,9 @@
     }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-800" id="app">
+<body class="bg-gray-50 text-gray-800">
 <!-- Navbar -->
+ <div id="app">
 <nav class="bg-white shadow-md sticky top-0 z-50">
   <div class="container mx-auto px-4 py-4 flex items-center justify-between">
     <!-- Logo -->
@@ -61,32 +63,27 @@
     </button>
 
     <!-- Nav Links -->
-    <ul id="nav-menu" class="hidden md:flex gap-6 items-center">
-      <li>
-        <a href="#"
-          class="relative px-4 py-2 text-gray-700 font-medium transition duration-300 transform hover:scale-105 hover:text-white hover:bg-green-600 rounded-lg">
-          Home
-        </a>
-      </li>
-      <li>
-        <a href="#"
-          class="relative px-4 py-2 text-gray-700 font-medium transition duration-300 transform hover:scale-105 hover:text-white hover:bg-green-600 rounded-lg">
-          Makanan
-        </a>
-      </li>
-      <li>
-        <a href="#"
-          class="relative px-4 py-2 text-gray-700 font-medium transition duration-300 transform hover:scale-105 hover:text-white hover:bg-green-600 rounded-lg">
-          Tentang
-        </a>
-      </li>
-      <li>
-        <a href="#"
-          class="relative px-4 py-2 text-gray-700 font-medium transition duration-300 transform hover:scale-105 hover:text-white hover:bg-green-600 rounded-lg">
-          Kontak
-        </a>
-      </li>
-    </ul>
+<ul id="nav-menu" class="hidden md:flex gap-6 items-center">
+  <!-- Link Umum -->
+  <li><a href="#" class="nav-link">Home</a></li>
+  <li><a href="#" class="nav-link">Makanan</a></li>
+  <li><a href="#" class="nav-link">Tentang</a></li>
+  <li><a href="#" class="nav-link">Kontak</a></li>
+
+  <!-- Tombol jika login -->
+  <li v-if="isLoggedIn">
+    <a href="profile.html" class="nav-link">Profile</a>
+  </li>
+  <li v-if="isLoggedIn">
+    <button @click="logout" class="nav-link">Logout</button>
+  </li>
+
+  <!-- Tombol jika belum login -->
+  <li v-else>
+    <a href="login.html" class="nav-link">Login</a>
+  </li>
+</ul>
+
   </div>
 </nav>
 
@@ -437,7 +434,56 @@
     </div>
   </div>
 </footer>
+</div>
+<script>
+const { createApp } = Vue;
 
+createApp({
+  data() {
+    return {
+      isLoggedIn: false,
+    };
+  },
+  methods: {
+    checkSession() {
+      const user = localStorage.getItem("user");
+      this.isLoggedIn = !!user;
+    },
+
+    async login(email, password) {
+      try {
+        const response = await fetch("http://localhost:8000/api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ email, password })
+        });
+
+        if (!response.ok) {
+          throw new Error("Login gagal");
+        }
+
+        const data = await response.json();
+        localStorage.setItem("user", JSON.stringify(data));
+        this.isLoggedIn = true;
+        window.location.href = "/"; // redirect ke home setelah login
+      } catch (err) {
+        console.error("Login gagal:", err);
+      }
+    },
+
+    logout() {
+      localStorage.removeItem("user");
+      this.isLoggedIn = false;
+      window.location.href = "index.html";
+    }
+  },
+  mounted() {
+    this.checkSession();
+  }
+}).mount("#app");
+</script>
 
 </body>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
