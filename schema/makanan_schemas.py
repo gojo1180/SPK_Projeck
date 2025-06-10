@@ -13,7 +13,7 @@ class Makanan(BaseModel):
     id_makanan: int
     nama: str
     deskripsi: Optional[str] = None
-    gambar: Optional[str] = None  # Base64 encoded
+    #gambar: Optional[str] = None  # Base64 encoded nanti di buks lagi pas production ready
 
     class Config:
         orm_mode = True
