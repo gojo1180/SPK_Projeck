@@ -54,8 +54,19 @@ async def update_makanan_controller(
 
     if gambar:
         content = await gambar.read()
-        makanan.gambar = base64.b64encode(content).decode("utf-8")
+        makanan.gambar = content
 
     db.commit()
     db.refresh(makanan)
-    return makanan
+
+    # encode gambar untuk response (jika perlu)
+    encoded_gambar = (
+        base64.b64encode(makanan.gambar).decode("utf-8") if makanan.gambar else None
+    )
+
+    return {
+        "id_makanan": makanan.id_makanan,
+        "nama": makanan.nama,
+        "deskripsi": makanan.deskripsi,
+        "gambar": encoded_gambar
+    }
