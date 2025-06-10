@@ -6,6 +6,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from utils.DB import Base, engine
 from routes import pengguna_routes
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 Base.metadata.create_all(bind=engine)
 
@@ -13,7 +14,7 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-# Gantilah secret_key ini dengan yang aman (acak & panjang)
+# Serve folder static
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(
@@ -44,10 +45,14 @@ from routes.admin import admin_auth, admin_makanan, admin_config
 
 from utils.DB import Base, engine
 from routes import pengguna_routes
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+# Serve folder static
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
@@ -67,4 +72,11 @@ app.include_router(pengguna_routes.router)
 def read_root():
     return {"message": "Welcome to the Gym Food DSS API!"}
 
+# Endpoint untuk dashboard
+@app.get("/static/dashboard.html")
+def get_dashboard():
+    return FileResponse("static/dashboard.html")
 
+@app.get("/loginadmin.html")
+def get_loginadmin():
+    return FileResponse("static/loginadmin.html")
