@@ -1,35 +1,28 @@
 from pydantic import BaseModel
-from typing import List
-from typing import Union, List # <-- 1. Tambahkan Union di sini
+from typing import Optional
 
 
-# Skema untuk satu item nilai gizi
-class NilaiGiziBase(BaseModel):
-    id_kriteria: int
-    nilai: float
-
-# Skema untuk menampilkan nilai gizi yang sudah ada
-class NilaiGizi(NilaiGiziBase):
-    id: int
-
-    class Config:
-        from_attributes = True
-
-# Skema dasar untuk makanan
-class MakananBase(BaseModel):
+class MakananCreate(BaseModel):
     nama: str
-    deskripsi: Union[str, None] = None 
-    gambar_url: Union[str, None] = None
-
-
-# Skema untuk membuat makanan baru, termasuk nilai gizinya
-class MakananCreate(MakananBase):
-    nilai_gizi: List[NilaiGiziBase]
-
-# Skema lengkap untuk menampilkan makanan, termasuk ID dan nilai gizinya
-class Makanan(MakananBase):
-    id_makanan: int
-    nilai_gizi: List[NilaiGizi] = []
+    deskripsi: Optional[str] = None
 
     class Config:
-        from_attributes = True
+        orm_mode = True
+
+class Makanan(BaseModel):
+    id_makanan: int
+    nama: str
+    deskripsi: Optional[str] = None
+    gambar: Optional[str] = None  # Base64 encoded
+
+    class Config:
+        orm_mode = True
+
+class MakananOut(BaseModel):
+    id_makanan: int
+    nama: str
+    deskripsi: Optional[str]
+    gambar: Optional[str]  # base64 string
+
+    class Config:
+        orm_mode = True

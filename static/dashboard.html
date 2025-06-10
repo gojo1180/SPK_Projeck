@@ -1,120 +1,467 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard Admin - HealthyGym</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/vue@3"></script>
-  <style>
-    .btn-3d {
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      transform-style: preserve-3d;
-    }
-    .btn-3d:hover {
-      transform: translateY(-3px) scale(1.01);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Admin - HealthyGym</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/toastify-js"
+    ></script>
+    <script src="https://unpkg.com/vue@3"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3"></script>
+    <style>
+      .btn-3d {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transform-style: preserve-3d;
+      }
+      .btn-3d:hover {
+        transform: translateY(-3px) scale(1.01);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
 
-    .active-link {
-      background-color: #064e3b; /* dark green */
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-    }
-  </style>
-</head>
-<body class="bg-gray-100">
-
-  <div id="app" class="flex min-h-screen overflow-hidden">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-green-700 text-white flex flex-col justify-between shadow-lg">
-      <div>
-        <div class="p-6 text-2xl font-bold tracking-wide border-b border-green-600">
-          🧘 HealthyGym
+      .active-link {
+        background-color: #064e3b; /* dark green */
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <div id="app" class="flex min-h-screen overflow-hidden">
+      <!-- Sidebar -->
+      <aside
+        class="w-64 bg-green-700 text-white flex flex-col justify-between shadow-lg"
+      >
+        <div>
+          <div
+            class="p-6 text-2xl font-bold tracking-wide border-b border-green-600"
+          >
+            🧘 HealthyGym
+          </div>
+          <nav class="px-4 py-6 flex flex-col gap-3 text-sm font-medium">
+            <button
+              @click="activePage = 'makanan'"
+              class="btn-3d text-left px-4 py-2 rounded-lg transition-all"
+              :class="{ 'active-link': activePage === 'makanan' }"
+            >
+              🍽️ Manajemen Makanan
+            </button>
+            <button
+              @click="activePage = 'bobot'"
+              class="btn-3d text-left px-4 py-2 rounded-lg transition-all"
+              :class="{ 'active-link': activePage === 'bobot' }"
+            >
+              ⚖️ Konfigurasi Bobot
+            </button>
+          </nav>
         </div>
-        <nav class="px-4 py-6 flex flex-col gap-3 text-sm font-medium">
+        <div class="p-4 border-t border-green-600">
           <button
-            @click="activePage = 'makanan'"
-            class="btn-3d text-left px-4 py-2 rounded-lg transition-all"
-            :class="{ 'active-link': activePage === 'makanan' }">
-            🍽️ Manajemen Makanan
+            @click="logout"
+            class="btn-3d w-full bg-red-600 hover:bg-red-700 py-2 text-sm font-semibold rounded-lg transition-all"
+          >
+            🚪 Logout
           </button>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main
+        class="flex-1 bg-white p-6 md:p-10 rounded-l-3xl shadow-inner overflow-y-auto transition-all duration-300"
+      >
+        <h1 class="text-3xl font-bold text-green-700 mb-6">Dashboard Admin</h1>
+
+        <!-- Manajemen Makanan -->
+        <section
+          v-if="activePage === 'makanan'"
+          class="space-y-4 animate-fade-in"
+        >
+          <!-- Tombol untuk membuka modal -->
           <button
-            @click="activePage = 'bobot'"
-            class="btn-3d text-left px-4 py-2 rounded-lg transition-all"
-            :class="{ 'active-link': activePage === 'bobot' }">
-            ⚖️ Konfigurasi Bobot
+            @click="showModal = true"
+            class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            ➕ Tambah Makanan
           </button>
-        </nav>
-      </div>
-      <div class="p-4 border-t border-green-600">
-        <button
-          @click="logout"
-          class="btn-3d w-full bg-red-600 hover:bg-red-700 py-2 text-sm font-semibold rounded-lg transition-all">
-          🚪 Logout
-        </button>
-      </div>
-    </aside>
 
-    <!-- Main Content -->
-    <main class="flex-1 bg-white p-6 md:p-10 rounded-l-3xl shadow-inner overflow-y-auto transition-all duration-300">
-      <h1 class="text-3xl font-bold text-green-700 mb-6">Dashboard Admin</h1>
+          <h2 class="text-xl font-semibold text-gray-700">📋 Daftar Makanan</h2>
 
-      <!-- Manajemen Makanan -->
-      <section v-if="activePage === 'makanan'" class="space-y-4 animate-fade-in">
-        <h2 class="text-xl font-semibold text-gray-700">📋 Daftar Makanan</h2>
-        <div class="text-gray-600">
-          Ini nanti akan berisi tabel makanan (akan kita buat berikutnya).
-        </div>
-      </section>
+          <!-- Tabel Daftar Makanan -->
+          <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border mt-4">
+              <thead>
+                <tr>
+                  <th class="py-2 px-4 border-b text-left">Nama</th>
+                  <th class="py-2 px-4 border-b text-left">Deskripsi</th>
+                  <th class="py-2 px-4 border-b text-left">Gambar</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="makanan in daftarMakanan" :key="makanan.id_makanan">
+                  <td class="py-2 px-4 border-b">{{ makanan.nama }}</td>
+                  <td class="py-2 px-4 border-b">{{ makanan.deskripsi }}</td>
+                  <td class="py-2 px-4 border-b">
+                    <img
+                      v-if="makanan.gambar"
+                      :src="'data:image/jpeg;base64,' + makanan.gambar"
+                      alt="Gambar Makanan"
+                      class="w-16 h-16 object-cover rounded"
+                    />
+                    <span v-else class="text-gray-400 italic">Tidak ada</span>
+                  </td>
+                  <td class="py-2 px-4 border-b">
+                    <button
+                      class="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded text-sm"
+                      @click="openEditModal(makanan)"
+                    >
+                      ✏ Edit
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-      <!-- Konfigurasi Bobot -->
-      <section v-if="activePage === 'bobot'" class="space-y-4 animate-fade-in">
-        <h2 class="text-xl font-semibold text-gray-700">⚙️ Konfigurasi Bobot Kriteria</h2>
-        <div class="text-gray-600">
-          Ini nanti akan menampilkan form pengaturan bobot.
-        </div>
-      </section>
-    </main>
-  </div>
+          <!-- Modal Edit Makanan -->
+          <div
+            v-if="showEditModal"
+            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          >
+            <div
+              class="bg-white rounded-xl p-6 w-full max-w-xl shadow-lg relative"
+            >
+              <button
+                @click="showEditModal = false"
+                class="absolute top-2 right-2 text-gray-500 hover:text-black"
+              >
+                ✖
+              </button>
 
-  <script type="module">
-    import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+              <h3 class="text-lg font-semibold mb-4">Edit Makanan</h3>
 
-    createApp({
-      data() {
-        return {
-          activePage: 'makanan',
+              <form @submit.prevent="submitEditMakanan">
+                <div class="mb-3">
+                  <label class="block text-sm font-medium">Nama Makanan</label>
+                  <input
+                    v-model="editForm.nama"
+                    type="text"
+                    class="w-full border px-3 py-2 rounded"
+                    required
+                  />
+                </div>
+
+                <div class="mb-3">
+                  <label class="block text-sm font-medium">Deskripsi</label>
+                  <textarea
+                    v-model="editForm.deskripsi"
+                    class="w-full border px-3 py-2 rounded"
+                  ></textarea>
+                </div>
+
+                <div class="mb-3">
+                  <label class="block text-sm font-medium"
+                    >Gambar Baru (opsional)</label
+                  >
+                  <input
+                    @change="handleEditFileUpload"
+                    type="file"
+                    accept="image/*"
+                    class="w-full"
+                  />
+                </div>
+
+                <div class="mt-4 text-right">
+                  <button
+                    type="submit"
+                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                  >
+                    Simpan Perubahan
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Modal -->
+          <div
+            v-if="showModal"
+            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          >
+            <div
+              class="bg-white rounded-xl p-6 w-full max-w-xl shadow-lg relative"
+            >
+              <!-- Tombol close -->
+              <button
+                @click="showModal = false"
+                class="absolute top-2 right-2 text-gray-500 hover:text-black"
+              >
+                ✖
+              </button>
+
+              <h3 class="text-lg font-semibold mb-4">Tambah Makanan</h3>
+
+              <form @submit.prevent="submitMakanan">
+                <!-- Nama -->
+                <div class="mb-3">
+                  <label class="block text-sm font-medium">Nama Makanan</label>
+                  <input
+                    v-model="form.nama"
+                    type="text"
+                    class="w-full border px-3 py-2 rounded"
+                    required
+                  />
+                </div>
+
+                <!-- Deskripsi -->
+                <div class="mb-3">
+                  <label class="block text-sm font-medium">Deskripsi</label>
+                  <textarea
+                    v-model="form.deskripsi"
+                    class="w-full border px-3 py-2 rounded"
+                  ></textarea>
+                </div>
+
+                <!-- Gambar -->
+                <div class="mb-3">
+                  <label class="block text-sm font-medium">Gambar</label>
+                  <input
+                    @change="handleFileUpload"
+                    type="file"
+                    accept="image/*"
+                    class="w-full"
+                  />
+                </div>
+                <!-- Submit -->
+                <div class="mt-4 text-right">
+                  <button
+                    type="submit"
+                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                  >
+                    Simpan
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- Konfigurasi Bobot -->
+        <section
+          v-if="activePage === 'bobot'"
+          class="space-y-4 animate-fade-in"
+        >
+          <h2 class="text-xl font-semibold text-gray-700">
+            ⚙️ Konfigurasi Bobot Kriteria
+          </h2>
+          <div class="text-gray-600">
+            Ini nanti akan menampilkan form pengaturan bobot.
+          </div>
+        </section>
+      </main>
+    </div>
+
+<script type="module">
+  import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+
+  createApp({
+    data() {
+      return {
+        activePage: "makanan",
+        showModal: false,
+        showEditModal: false,
+        form: {
+          nama: "",
+          deskripsi: "",
+          gambar: null,
+        },
+        editForm: {
+          id_makanan: null,
+          nama: "",
+          deskripsi: "",
+          gambar: null,
+        },
+        daftarMakanan: [],
+      };
+    },
+    mounted() {
+      const token = localStorage.getItem("admin_token");
+      if (!token) {
+        window.location.href = "/loginadmin.html";
+      } else {
+        this.loadMakanan();
+      }
+    },
+    methods: {
+      logout() {
+        localStorage.removeItem("admin_token");
+        window.location.href = "/static/loginadmin.html";
+      },
+      handleFileUpload(event) {
+        this.form.gambar = event.target.files[0];
+      },
+      handleEditFileUpload(event) {
+        this.editForm.gambar = event.target.files[0];
+      },
+      async submitMakanan() {
+        const formData = new FormData();
+        formData.append("nama", this.form.nama);
+        formData.append("deskripsi", this.form.deskripsi);
+        if (this.form.gambar) {
+          formData.append("gambar", this.form.gambar);
+        }
+
+        try {
+          const token = localStorage.getItem("admin_token");
+
+          const response = await fetch("http://localhost:8000/admin/makanan/", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || "Gagal menambahkan makanan");
+          }
+
+          const newFood = await response.json();
+
+          Toastify({
+            text: `Makanan "${newFood.nama}" berhasil ditambahkan!`,
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#4CAF50",
+          }).showToast();
+
+          this.closeModal();
+          this.loadMakanan();
+        } catch (error) {
+          Toastify({
+            text: "Error: " + error.message,
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#f44336",
+          }).showToast();
         }
       },
-      mounted() {
-        const token = localStorage.getItem('admin_token')
-        if (!token) {
-          window.location.href = '/loginadmin.html'
+      openEditModal(makanan) {
+        this.editForm = {
+          id_makanan: makanan.id_makanan,
+          nama: makanan.nama,
+          deskripsi: makanan.deskripsi,
+          gambar: null,
+        };
+        this.showEditModal = true;
+      },
+      async submitEditMakanan() {
+        const formData = new FormData();
+        formData.append("nama", this.editForm.nama);
+        formData.append("deskripsi", this.editForm.deskripsi);
+        if (this.editForm.gambar) {
+          formData.append("gambar", this.editForm.gambar);
+        }
+
+        try {
+          const token = localStorage.getItem("admin_token");
+
+          const response = await fetch(
+            `http://localhost:8000/admin/makanan/${this.editForm.id_makanan}`,
+            {
+              method: "PUT",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              body: formData,
+            }
+          );
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || "Gagal mengedit makanan");
+          }
+
+          Toastify({
+            text: `Makanan "${this.editForm.nama}" berhasil diperbarui!`,
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#4CAF50",
+          }).showToast();
+
+          this.showEditModal = false;
+          this.loadMakanan();
+        } catch (error) {
+          Toastify({
+            text: "Error: " + error.message,
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#f44336",
+          }).showToast();
         }
       },
-      methods: {
-        logout() {
-          localStorage.removeItem('admin_token')
-          window.location.href = '/static/loginadmin.html'
+      closeModal() {
+        this.showModal = false;
+        this.form = {
+          nama: "",
+          deskripsi: "",
+          gambar: null,
+        };
+        const fileInput = document.querySelector('input[type="file"]');
+        if (fileInput) fileInput.value = "";
+      },
+      async loadMakanan() {
+        try {
+          const token = localStorage.getItem("admin_token");
+          const response = await fetch("http://localhost:8000/admin/makanan/", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error("Gagal memuat data makanan");
+          }
+
+          const data = await response.json();
+          this.daftarMakanan = data;
+        } catch (error) {
+          console.error("Gagal memuat makanan:", error.message);
+        }
+      },
+    },
+  }).mount("#app");
+</script>
+
+
+    <style>
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
       }
-    }).mount('#app')
-  </script>
-
-  <style>
-    @keyframes fade-in {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
+      .animate-fade-in {
+        animation: fade-in 0.4s ease-out;
       }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    .animate-fade-in {
-      animation: fade-in 0.4s ease-out;
-    }
-  </style>
-</body>
+    </style>
+  </body>
 </html>
