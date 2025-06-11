@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query, HTTPException # <-- 2. HTTPException ditambahkan
+from fastapi import APIRouter, Depends, Query, HTTPException 
 from sqlalchemy.orm import Session
 from typing import List
 from pydantic import BaseModel 
