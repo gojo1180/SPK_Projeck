@@ -161,6 +161,7 @@ createApp({
   data() {
     return {
       user: null,
+      isLoggedIn: false,
       form: {
         nama: '',
         email: '',
@@ -173,9 +174,8 @@ createApp({
       error: null,
       loading: false,
       showDropdown: false,
-      showMenu: false, // untuk toggle mobile menu (hamburger)
-      tab: 'profil',
-      isLoggedIn: false
+      showMenu: false,
+      tab: 'profil'
     };
   },
   computed: {
@@ -187,22 +187,40 @@ createApp({
     }
   },
   mounted() {
-    this.checkSession();
+    this.checkLoginSession();
 
-    // Deteksi klik luar nav untuk menutup dropdown desktop
+    // Tutup dropdown jika klik di luar nav
     document.addEventListener("click", (e) => {
       if (!e.target.closest("nav")) this.showDropdown = false;
     });
+  },
+  methods: {
+    checkLoginSession() {
+      const token = localStorage.getItem("authToken");
+      const userRaw = localStorage.getItem("user");
 
-    // Ambil data user dari localStorage
-    const userData = JSON.parse(localStorage.getItem("user"));
-    if (!userData || !userData.id_pengguna) {
-      this.showToast("User belum login atau data tidak ditemukan.", "error");
-      return;
-    }
+      if (!token || !userRaw) {
+        this.forceLogout("Anda belum login.");
+        return;
+      }
 
-    // Ambil data user dari API
-    fetch(`http://localhost:8000/api/pengguna/${userData.id_pengguna}`)
+      let userData;
+      try {
+        userData = JSON.parse(userRaw);
+        if (!userData.id_pengguna) throw new Error();
+      } catch {
+        this.forceLogout("Data user tidak valid.");
+        return;
+      }
+
+      this.isLoggedIn = true;
+
+      // Ambil data user dari server
+      fetch(`http://localhost:8000/api/pengguna/${userData.id_pengguna}`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      })
       .then(res => {
         if (!res.ok) throw new Error("Gagal mengambil data user.");
         return res.json();
@@ -217,18 +235,30 @@ createApp({
         this.showToast(err.message, "error");
         console.error(err);
       });
-  },
-  methods: {
-    checkSession() {
-      const user = localStorage.getItem("user");
-      this.isLoggedIn = !!user;
     },
+
+    forceLogout(message = "Session habis. Silakan login kembali.") {
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("user");
+      this.isLoggedIn = false;
+      this.user = null;
+      this.showToast(message, "error");
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 1500);
+    },
+
+    logout() {
+      this.forceLogout("Berhasil logout.");
+    },
+
     async updateUser() {
       this.loading = true;
-      this.error = null;
+      const token = localStorage.getItem("authToken");
       const userData = JSON.parse(localStorage.getItem("user"));
-      if (!userData || !userData.id_pengguna) {
-        this.showToast("User belum login.", "error");
+
+      if (!token || !userData?.id_pengguna) {
+        this.showToast("User tidak valid.", "error");
         this.loading = false;
         return;
       }
@@ -242,25 +272,30 @@ createApp({
       try {
         const response = await fetch(`http://localhost:8000/api/update/${userData.id_pengguna}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
           body: JSON.stringify(payload)
         });
 
         if (!response.ok) {
           const resData = await response.json();
-          this.showToast(resData.detail || "Gagal memperbarui data user.", "error");
+          this.showToast(resData.detail || "Gagal memperbarui data.", "error");
           return;
         }
 
-        this.user = await response.json();
+        const updatedData = await response.json();
+        this.user = updatedData;
         this.showToast("Profil berhasil diperbarui!", "success");
       } catch (err) {
-        this.showToast(err.message, "error");
         console.error(err);
+        this.showToast("Terjadi kesalahan saat update.", "error");
       } finally {
         this.loading = false;
       }
     },
+
     changePassword() {
       if (this.password.old && this.password.new) {
         this.showToast("Password berhasil diubah!", "success");
@@ -270,11 +305,7 @@ createApp({
         this.showToast("Lengkapi kedua kolom password.", "error");
       }
     },
-    logout() {
-      localStorage.removeItem("user");
-      this.isLoggedIn = false;
-      window.location.href = "index.html";
-    },
+
     showToast(message, type = "info") {
       Toastify({
         text: message,
@@ -290,6 +321,9 @@ createApp({
   }
 }).mount("#app");
 </script>
+
+
+
 
 
 <style>

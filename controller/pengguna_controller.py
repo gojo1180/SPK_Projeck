@@ -40,10 +40,19 @@ def login_user(db: Session, credentials: UserLogin):
     )
 
     return {
-        "success": True,
-        "message": "Login berhasil.",
-        "token": {"access_token": access_token, "token_type": "bearer"}
+    "success": True,
+    "message": "Login berhasil.",
+    "token": {
+        "access_token": access_token,
+        "token_type": "bearer"
+    },
+    "user": {
+        "id_pengguna": user.id_pengguna,
+        "email": user.email,
+        "nama": user.nama,
+        "fase_latihan": user.fase_latihan
     }
+}
 
 def update_user(db: Session, user_id: int, user_update: UserUpdate):
     user = db.query(Pengguna).filter(Pengguna.id_pengguna == user_id).first()

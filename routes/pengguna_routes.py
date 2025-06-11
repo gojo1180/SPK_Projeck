@@ -21,19 +21,27 @@ def api_register(user: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail=result["message"])
     return result["data"]
 
-# --- UBAH FUNGSI DI BAWAH INI ---
-@router.post("/login", response_model=TokenSchema)
+@router.post("/login")
 def api_login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    # 2. Ubah parameter dari `credentials: UserLogin` menjadi `form_data: OAuth2PasswordRequestForm`
-    
-    # Buat objek UserLogin secara manual untuk dikirim ke controller
+    # Buat objek UserLogin dari form
     credentials = UserLogin(email=form_data.username, password=form_data.password)
-    
-    result = login_user(db, credentials) # Kirim ke controller
+
+    result = login_user(db, credentials)
     if not result["success"]:
         raise HTTPException(status_code=401, detail=result["message"])
-    return result["token"]
-# --- PERUBAHAN SELESAI ---
+
+    # Ambil token dan user (dalam bentuk dict)
+    token = result["token"]
+    user = result["user"]
+
+    return {
+        "access_token": token,
+        "user": {
+            "id_pengguna": user["id_pengguna"],
+            "nama": user["nama"],
+            "email": user["email"]
+        }
+    }
 
 @router.get("/pengguna/{user_id}", response_model=UserResponse)
 def get_user(user_id: int, db: Session = Depends(get_db)):

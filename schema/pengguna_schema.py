@@ -9,7 +9,7 @@ class UserCreate(BaseModel):
     nama: str
     password: str
     email: EmailStr
-    fase_latihan: FaseLatihanEnum 
+    #fase_latihan: FaseLatihanEnum 
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
@@ -20,10 +20,12 @@ class UserUpdate(BaseModel):
     password: Optional[str] = None
     fase_latihan: Optional[FaseLatihanEnum] = None 
 
-class UserResponse(UserBase):
+class UserResponse(BaseModel):
     id_pengguna: int
     nama: str
-    fase_latihan: FaseLatihanEnum
+    email: str
+    fase_latihan: Optional[str]
+
     
     class Config:
         from_attributes = True

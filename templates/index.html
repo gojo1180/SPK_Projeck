@@ -435,55 +435,38 @@
 </footer>
 </div>
 <script>
-const { createApp } = Vue;
+  const { createApp } = Vue;
 
-createApp({
-  data() {
-    return {
-      isLoggedIn: false,
-      showMenu: false, // ⬅️ ini penting
-    };
-  },
-  methods: {
-    checkSession() {
-      const user = localStorage.getItem("user");
-      this.isLoggedIn = !!user;
+  createApp({
+    data() {
+      return {
+        user: null,         // menyimpan data user
+        isLoggedIn: false   // status login
+      };
     },
-
-    async login(email, password) {
-      try {
-        const response = await fetch("http://localhost:8000/api/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ email, password })
-        });
-
-        if (!response.ok) {
-          throw new Error("Login gagal");
+    mounted() {
+      this.checkLoginSession();
+    },
+    methods: {
+      checkLoginSession() {
+        const token = localStorage.getItem("authToken");  // ambil token
+        if (token) {
+          this.isLoggedIn = true;
+          this.user = { token }; // kamu bisa fetch data user lebih lanjut jika butuh
+        } else {
+          this.isLoggedIn = false;
         }
-
-        const data = await response.json();
-        localStorage.setItem("user", JSON.stringify(data));
-        this.isLoggedIn = true;
-        window.location.href = "/"; // redirect ke home setelah login
-      } catch (err) {
-        console.error("Login gagal:", err);
+      },
+      logout() {
+        localStorage.removeItem("authToken");
+        this.isLoggedIn = false;
+        this.user = null;
+        window.location.href = "login.html";
       }
-    },
-
-    logout() {
-      localStorage.removeItem("user");
-      this.isLoggedIn = false;
-      window.location.href = "index.html";
     }
-  },
-  mounted() {
-    this.checkSession();
-  }
-}).mount("#app");
+  }).mount("#app");
 </script>
+
 
 
 </body>
