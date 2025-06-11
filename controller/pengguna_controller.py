@@ -75,3 +75,5 @@ def update_user(db: Session, user_id: int, user_update: UserUpdate):
     db.refresh(user)
     
     return {"success": True, "message": "Profil berhasil diperbarui.", "data": user}
+
+ # Asumsikan kamu punya fungsi ini

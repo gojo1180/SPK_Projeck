@@ -56,3 +56,5 @@ def api_update_user(user_id: int, user_update: UserUpdate, db: Session = Depends
     if not result["success"]:
         raise HTTPException(status_code=400, detail=result["message"])
     return result["data"]
+
+

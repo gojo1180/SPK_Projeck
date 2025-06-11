@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test BMI Calculator</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-10">
+  <div id="app" class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
+    <h1 class="text-2xl font-bold mb-4">BMI Calculator</h1>
+
+    <form @submit.prevent="calculateBMI" class="space-y-4">
+      <div>
+        <label class="block font-semibold">Berat Badan ({{ unitLabel.weight }}):</label>
+        <input type="number" v-model="weight" required min="1"
+               class="w-full p-2 border rounded" />
+      </div>
+
+      <div>
+        <label class="block font-semibold">Tinggi Badan ({{ unitLabel.height }}):</label>
+        <input type="number" v-model="height" required min="1"
+               class="w-full p-2 border rounded" />
+      </div>
+
+      <div>
+        <label class="block font-semibold">Satuan:</label>
+        <select v-model="unit" class="w-full p-2 border rounded">
+          <option value="metric">Metric (kg, cm)</option>
+          <option value="imperial">Imperial (lb, ft)</option>
+        </select>
+      </div>
+
+      <button type="submit"
+              class="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600">
+        Hitung BMI
+      </button>
+    </form>
+
+    <div v-if="result" class="mt-6">
+      <h2 class="text-xl font-semibold">Hasil:</h2>
+      <p><strong>BMI:</strong> {{ result.bmi.toFixed(2) }}</p>
+      <p><strong>Status:</strong> {{ result.status }}</p>
+      <p><strong>Saran:</strong> {{ result.suggestion }}</p>
+      <p class="text-sm text-gray-600">Unit: {{ unit }}</p>
+    </div>
+
+    <div v-if="error" class="mt-4 text-red-600">
+      <strong>Error:</strong> {{ error }}
+    </div>
+  </div>
+
+  <script>
+    const { createApp, computed } = Vue;
+
+    createApp({
+      data() {
+        return {
+          weight: '',
+          height: '',
+          unit: 'metric',
+          result: null,
+          error: ''
+        };
+      },
+      computed: {
+        unitLabel() {
+          return this.unit === 'metric'
+            ? { weight: 'kg', height: 'cm' }
+            : { weight: 'lb', height: 'ft' };
+        }
+      },
+      methods: {
+        async calculateBMI() {
+          this.result = null;
+          this.error = '';
+          try {
+            const response = await fetch(`http://localhost:8000/api/bmi?weight=${this.weight}&height=${this.height}&unit=${this.unit}`);
+            if (!response.ok) throw new Error(await response.text());
+            this.result = await response.json();
+          } catch (err) {
+            this.error = err.message || "Gagal menghitung BMI";
+          }
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>

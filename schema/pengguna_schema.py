@@ -20,6 +20,7 @@ class UserUpdate(BaseModel):
     password: Optional[str] = None
     fase_latihan: Optional[FaseLatihanEnum] = None 
 
+
 class UserResponse(BaseModel):
     id_pengguna: int
     nama: str
