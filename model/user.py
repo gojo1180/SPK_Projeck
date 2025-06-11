@@ -22,4 +22,3 @@ class Pengguna(Base):
     bmi = relationship("BMI", back_populates="pengguna", cascade="all, delete-orphan")
     hasil = relationship("Hasil", back_populates="pengguna", cascade="all, delete-orphan")
     bobot_preferensi = relationship("BobotPreferensi", back_populates="pengguna", cascade="all, delete-orphan")
-    nilai_gizi_custom = relationship("NilaiGizi", back_populates="pembuat", cascade="all, delete-orphan")

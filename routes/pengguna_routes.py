@@ -1,37 +1,39 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
+# 1. Impor komponen yang diperlukan
+from fastapi.security import OAuth2PasswordRequestForm 
 from sqlalchemy.orm import Session
+
 from utils.DB import get_db
 from schema.pengguna_schema import UserCreate, UserLogin, UserResponse, UserUpdate
 from controller.pengguna_controller import register_user, login_user, update_user
-from fastapi import APIRouter, Request
 from model.user import Pengguna
+from schema.admin_schemas import TokenSchema 
 
 router = APIRouter(
     prefix="/api",
     tags=["Pengguna"]
 )
 
-
-
-@router.post("/logout")
-def logout(request: Request):
-    request.session.clear()
-    return {"message": "Logged out"}
-
 @router.post("/register", response_model=UserResponse)
 def api_register(user: UserCreate, db: Session = Depends(get_db)):
     result = register_user(db, user)
     if not result["success"]:
         raise HTTPException(status_code=400, detail=result["message"])
-    return result["data"]  # pastikan controller mengembalikan user di "data"
+    return result["data"]
 
-@router.post("/login", response_model=UserResponse)
-def api_login(credentials: UserLogin, db: Session = Depends(get_db)):
-    result = login_user(db, credentials)
+# --- UBAH FUNGSI DI BAWAH INI ---
+@router.post("/login", response_model=TokenSchema)
+def api_login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    # 2. Ubah parameter dari `credentials: UserLogin` menjadi `form_data: OAuth2PasswordRequestForm`
+    
+    # Buat objek UserLogin secara manual untuk dikirim ke controller
+    credentials = UserLogin(email=form_data.username, password=form_data.password)
+    
+    result = login_user(db, credentials) # Kirim ke controller
     if not result["success"]:
         raise HTTPException(status_code=401, detail=result["message"])
-    return result["data"]
- # controller harus mengembalikan user di "data"
+    return result["token"]
+# --- PERUBAHAN SELESAI ---
 
 @router.get("/pengguna/{user_id}", response_model=UserResponse)
 def get_user(user_id: int, db: Session = Depends(get_db)):
@@ -46,5 +48,3 @@ def api_update_user(user_id: int, user_update: UserUpdate, db: Session = Depends
     if not result["success"]:
         raise HTTPException(status_code=400, detail=result["message"])
     return result["data"]
-
-

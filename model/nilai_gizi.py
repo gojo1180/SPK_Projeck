@@ -10,10 +10,6 @@ class NilaiGizi(Base):
     id_kriteria = Column(Integer, ForeignKey("kriteria.id_kriteria"), nullable=False)
     nilai = Column(Float, nullable=False)
     
-    # FK ke pengguna, diisi jika ini makanan custom buatan pengguna
-    id_pengguna_pembuat = Column(Integer, ForeignKey("pengguna.id_pengguna"), nullable=True)
-
     # Relationships
     makanan = relationship("Makanan", back_populates="nilai_gizi")
     kriteria = relationship("Kriteria", back_populates="nilai_gizi")
-    pembuat = relationship("Pengguna", back_populates="nilai_gizi_custom")
