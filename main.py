@@ -4,7 +4,7 @@ from utils.DB import Base, engine
 
 
 from routes.admin import admin_auth, admin_makanan, admin_config
-from routes import pengguna_routes, rekomendasi_routes, preferensi_routes
+from routes import pengguna_routes, rekomendasi_routes, preferensi_routes,bmi_routes
 
 Base.metadata.create_all(bind=engine)
 
@@ -13,6 +13,8 @@ app = FastAPI(
     description="API untuk rekomendasi makanan bagi gym enthusiast.",
     version="1.0.0"
 )
+
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -23,6 +25,7 @@ app.add_middleware(
 )
 
 print("Mendaftarkan router...")
+app.include_router(bmi_routes.router)
 app.include_router(admin_auth.router)
 app.include_router(admin_makanan.router) 
 app.include_router(admin_config.router)

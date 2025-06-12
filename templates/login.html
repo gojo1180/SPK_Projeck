@@ -37,48 +37,55 @@
   </div>
 
   <!-- Tambahkan Vue -->
-  <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
-  <script>
-    const { createApp } = Vue;
+ <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+<script>
+  const { createApp } = Vue;
 
-    createApp({
-      data() {
-        return {
-          email: "",
-          password: ""
-        };
-      },
-      methods: {
-        async login() {
-          try {
-            const response = await fetch("http://localhost:8000/api/login", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                email: this.email,
-                password: this.password
-              })
-            });
+  createApp({
+    data() {
+      return {
+        email: "",
+        password: ""
+      };
+    },
+    methods: {
+      async login() {
+        const formData = new URLSearchParams();
+        formData.append("username", this.email);
+        formData.append("password", this.password);
 
-            const data = await response.json();
+        try {
+          const response = await fetch("http://localhost:8000/api/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData
+          });
 
-            if (response.ok) {
-              // Simpan ke localStorage (bisa sesuaikan propertinya)
-              localStorage.setItem("user", JSON.stringify(data));
-              window.location.href = "index.html";
-            } else {
-              alert(data.detail || "Login gagal.");
-            }
-          } catch (error) {
-            console.error("Login error:", error);
-            alert("Terjadi kesalahan. Periksa koneksi atau server.");
+          const data = await response.json();
+
+          if (response.ok && data.access_token && data.user && data.user.id_pengguna) {
+            // Simpan token & user ke localStorage
+            localStorage.setItem("authToken", data.access_token);
+            localStorage.setItem("user", JSON.stringify(data.user));
+
+            alert("Login berhasil!");
+            window.location.href = "index.html"; // Arahkan ke halaman profile
+          } else {
+            alert("Login gagal: Data tidak lengkap.");
+            console.warn("Data yang diterima:", data);
           }
+        } catch (error) {
+          console.error("Terjadi error saat login:", error);
+          alert("Terjadi kesalahan jaringan.");
         }
       }
-    }).mount("#app");
-  </script>
+    }
+  }).mount("#app");
+</script>
+
+
 </body>
 
 </html>
