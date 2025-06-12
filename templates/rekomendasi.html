@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rekomendasi Makanan - HealthyGym</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <style>
+    .card:hover {
+      transform: perspective(1000px) rotateX(2deg) rotateY(2deg) scale(1.03);
+      transition: all 0.4s ease;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+    .glass {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-green-50 to-white min-h-screen font-sans">
+<!-- Navbar -->
+  <div id="app">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+      <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-green-600">HealthyGym</h1>
+        <!-- Dropdown toggle -->
+        <button @click="showMenu = !showMenu" class="md:hidden focus:outline-none">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+        <!-- Menu desktop -->
+        <ul class="hidden md:flex gap-6 items-center">
+          <li><a href="index.html" class="hover:text-green-600 font-medium">Home</a></li>
+          <li><a href="rekomendasi.html" class="hover:text-green-600 font-medium">Makanan</a></li>
+          <li><a href="about us.html" class="hover:text-green-600 font-medium">Tentang</a></li>
+          <li><a href="contact.html" class="hover:text-green-600 font-medium">Kontak</a></li>
+          <li v-if="isLoggedIn"><a href="profile.html" class="hover:text-green-600 font-medium">Profile</a></li>
+          <li v-if="isLoggedIn"><button @click="logout" class="hover:text-green-600 font-medium">Logout</button></li>
+          <li v-else><a href="login.html" class="hover:text-green-600 font-medium">Login</a></li>
+        </ul>
+      </div>
+
+      <!-- Dropdown menu mobile -->
+      <transition name="fade-slide">
+        <ul v-show="showMenu" class="md:hidden px-4 pb-4 space-y-2">
+          <li><a href="index.html" class="block py-2 text-green-600">Home</a></li>
+          <li><a href="rekomendasi.html" class="block py-2 text-green-600">Makanan</a></li>
+          <li><a href="about us.html" class="block py-2 text-green-600">Tentang</a></li>
+          <li><a href="contact.html" class="block py-2 text-green-600">Kontak</a></li>
+          <li v-if="isLoggedIn"><a href="profile.html" class="block py-2 text-green-600">Profile</a></li>
+          <li v-if="isLoggedIn"><button @click="logout" class="block py-2 text-green-600">Logout</button></li>
+          <li v-else><a href="login.html" class="block py-2 text-green-600">Login</a></li>
+        </ul>
+      </transition>
+    </nav>
+
+  <div id="app" class="max-w-7xl mx-auto px-6 py-10">
+  <h1 class="text-4xl font-extrabold text-center mb-10 text-green-800">🍽️ Rekomendasi Makanan Sehat</h1>
+
+  <!-- Form Pilihan -->
+  <form @submit.prevent="fetchRekomendasi" class="mb-8 grid sm:grid-cols-2 gap-6 bg-white p-6 rounded-2xl shadow">
+    <div>
+      <label class="block text-sm font-semibold text-gray-700 mb-2">Fase Latihan</label>
+      <select v-model="fase_latihan" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500">
+        <option value="bulking">Bulking</option>
+        <option value="cutting">Cutting</option>
+        <option value="maintenance">Maintenance</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-sm font-semibold text-gray-700 mb-2">Waktu</label>
+      <select v-model="timing" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500">
+        <option value="pre_workout">Pre-Workout</option>
+        <option value="post_workout">Post-Workout</option>
+      </select>
+    </div>
+    <div class="col-span-2 text-center">
+      <button class="bg-gradient-to-r from-green-600 to-green-800 text-white px-8 py-3 rounded-xl font-medium hover:scale-105 transition transform duration-300 shadow-md">
+        🔍 Lihat Rekomendasi
+      </button>
+    </div>
+  </form>
+
+  <!-- Form Preferensi -->
+  <div class="glass rounded-2xl p-6 mb-10">
+    <h2 class="text-2xl font-semibold text-green-700 mb-6">⚙️ Atur Bobot Preferensi</h2>
+    <form @submit.prevent="updatePreferensi" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div v-for="(value, key) in preferensi" :key="key">
+        <label class="block text-sm font-medium text-gray-800 mb-1 capitalize">{{ key.replace('_', ' ') }}</label>
+        <input type="number" min="1" max="5" v-model.number="preferensi[key]" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400">
+      </div>
+      <div class="md:col-span-3 text-center mt-4">
+        <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">💾 Simpan Preferensi</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Rekomendasi -->
+  <div>
+    <h2 class="text-2xl font-bold text-green-700 mb-6">🔥 Hasil Rekomendasi</h2>
+    <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div v-for="item in rekomendasi" :key="item.id" class="card bg-white rounded-2xl overflow-hidden shadow-lg transform transition hover:scale-105 hover:shadow-2xl">
+        <img :src="item.gambar" alt="Makanan" class="w-full h-40 object-cover">
+        <div class="p-4">
+          <h3 class="text-xl font-semibold text-green-700">{{ item.nama }}</h3>
+          <p class="text-sm text-gray-600 my-2">{{ item.penjelasan }}</p>
+          <div class="text-sm text-gray-700 font-medium">Skor: <span class="text-green-600 font-bold">{{ item.skor.toFixed(4) }}</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const { createApp } = Vue;
+createApp({
+  data() {
+    return {
+      user: null,         // menyimpan data user
+      isLoggedIn: false ,
+      fase_latihan: 'bulking',
+      timing: 'pre_workout',
+      preferensi: {},
+      rekomendasi: []
+    };
+  },
+  mounted() {
+    this.getPreferensi();
+    this.checkLoginSession();
+  },
+  methods: {
+    checkLoginSession() {
+        const token = localStorage.getItem("authToken");  // ambil token
+        if (token) {
+          this.isLoggedIn = true;
+          this.user = { token }; // kamu bisa fetch data user lebih lanjut jika butuh
+        } else {
+          this.isLoggedIn = false;
+        }
+      },
+      logout() {
+        localStorage.removeItem("authToken");
+        this.isLoggedIn = false;
+        this.user = null;
+        window.location.href = "login.html";
+      },
+      
+    async fetchRekomendasi() {
+      try {
+        const res = await axios.get(`/api/rekomendasi?timing=${this.timing}`, {
+          headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }
+        });
+        this.rekomendasi = res.data;
+      } catch (err) {
+        alert('❌ Gagal mengambil rekomendasi');
+      }
+    },
+    async getPreferensi() {
+      try {
+        const res = await axios.get('/api/users/me/preferences', {
+          headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }
+        });
+        this.preferensi = res.data;
+      } catch (err) {
+        alert('⚠️ Gagal mengambil preferensi. Menggunakan default bobot.');
+      }
+    },
+    async updatePreferensi() {
+      try {
+        await axios.put('/api/users/me/preferences', this.preferensi, {
+          headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }
+        });
+        alert('✅ Preferensi berhasil diperbarui!');
+      } catch (err) {
+        alert('❌ Gagal memperbarui preferensi');
+      }
+    }
+  }
+}).mount('#app')
+</script>
+</body>
+</html>

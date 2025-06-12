@@ -15,7 +15,6 @@ def register_user(db: Session, user_data: UserCreate):
         nama=user_data.nama,
         email=user_data.email,
         password_hash=hashed_password,
-        fase_latihan=user_data.fase_latihan 
     )
 
     db.add(new_user)
@@ -50,7 +49,7 @@ def login_user(db: Session, credentials: UserLogin):
         "id_pengguna": user.id_pengguna,
         "email": user.email,
         "nama": user.nama,
-        "fase_latihan": user.fase_latihan
+        #"fase_latihan": user.fase_latihan
     }
 }
 

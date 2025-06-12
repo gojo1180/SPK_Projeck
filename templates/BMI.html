@@ -1,57 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Test BMI Calculator</title>
+  <meta charset="UTF-8" />
+  <title>BMI Calculator</title>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <style>
+    .card-3d {
+      transform-style: preserve-3d;
+      transition: transform 0.5s ease;
+    }
+    .card-3d:hover {
+      transform: rotateY(5deg) scale(1.01);
+    }
+  </style>
 </head>
-<body class="bg-gray-100 p-10">
-  <div id="app" class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
-    <h1 class="text-2xl font-bold mb-4">BMI Calculator</h1>
+<body class="bg-gradient-to-br from-green-100 to-blue-100 min-h-screen flex items-center justify-center px-4">
+  <div id="app" class="max-w-lg w-full bg-white p-8 rounded-2xl shadow-2xl card-3d transition-all duration-500">
+    <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">BMI Calculator</h1>
 
     <form @submit.prevent="calculateBMI" class="space-y-4">
       <div>
-        <label class="block font-semibold">Berat Badan ({{ unitLabel.weight }}):</label>
+        <label class="block font-semibold text-gray-700">Berat Badan ({{ unitLabel.weight }}):</label>
         <input type="number" v-model="weight" required min="1"
-               class="w-full p-2 border rounded" />
+          class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400" />
       </div>
 
       <div>
-        <label class="block font-semibold">Tinggi Badan ({{ unitLabel.height }}):</label>
+        <label class="block font-semibold text-gray-700">Tinggi Badan ({{ unitLabel.height }}):</label>
         <input type="number" v-model="height" required min="1"
-               class="w-full p-2 border rounded" />
+          class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400" />
       </div>
 
       <div>
-        <label class="block font-semibold">Satuan:</label>
-        <select v-model="unit" class="w-full p-2 border rounded">
+        <label class="block font-semibold text-gray-700">Satuan:</label>
+        <select v-model="unit"
+          class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
           <option value="metric">Metric (kg, cm)</option>
           <option value="imperial">Imperial (lb, ft)</option>
         </select>
       </div>
 
       <button type="submit"
-              class="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600">
+        class="w-full mb-6 bg-gradient-to-r from-green-400 to-green-600 text-white font-bold py-3 rounded-lg shadow-md transform hover:scale-105 transition duration-300">
         Hitung BMI
       </button>
     </form>
 
-    <div v-if="result" class="mt-6">
-      <h2 class="text-xl font-semibold">Hasil:</h2>
-      <p><strong>BMI:</strong> {{ result.bmi.toFixed(2) }}</p>
-      <p><strong>Status:</strong> {{ result.status }}</p>
-      <p><strong>Saran:</strong> {{ result.suggestion }}</p>
-      <p class="text-sm text-gray-600">Unit: {{ unit }}</p>
+<div v-if="result" class="mt-6 space-y-4">
+  <h2 class="text-xl font-semibold">Hasil:</h2>
+  <p><strong>BMI:</strong> {{ result.bmi.toFixed(2) }}</p>
+  <p><strong>Status:</strong> {{ result.status }}</p>
+  <p><strong>Saran:</strong> {{ result.suggestion }}</p>
+  <p class="text-sm text-gray-600">Unit: {{ unit }}</p>
+
+  <!-- Linear BMI Bar -->
+  <div class="relative mt-6">
+    <!-- Background bar -->
+    <div class="flex h-5 rounded-full overflow-hidden shadow-md">
+      <div class="flex-1 bg-blue-300" title="Underweight"></div>
+      <div class="flex-1 bg-green-400" title="Normal"></div>
+      <div class="flex-1 bg-yellow-400" title="Overweight"></div>
+      <div class="flex-1 bg-red-400" title="Obese"></div>
     </div>
 
-    <div v-if="error" class="mt-4 text-red-600">
-      <strong>Error:</strong> {{ error }}
+    <!-- Indicator -->
+    <div class="relative">
+      <div
+        class="absolute top-1.5 transform -translate-x-1/2"
+        :style="{ left: bmiIndicatorPosition + '%' }"
+      >
+        <div class="text-red-600 text-xl animate-bounce">▲</div>
+      </div>
+    </div>
+
+    <!-- Labels -->
+    <div class="flex justify-between text-sm mt-2 px-1 text-gray-600">
+      <span>&lt;18.5</span>
+      <span>18.5–24.9</span>
+      <span>25–29.9</span>
+      <span>30+</span>
+    </div>
+  </div>
+</div>
+
+
+    <div v-if="error" class="mt-4 text-red-600 text-center font-medium">
+      ⚠️ {{ error }}
     </div>
   </div>
 
   <script>
-    const { createApp, computed } = Vue;
+    const { createApp, computed, watch } = Vue;
 
     createApp({
       data() {
@@ -60,27 +101,72 @@
           height: '',
           unit: 'metric',
           result: null,
-          error: ''
+          error: '',
+          chart: null,
         };
       },
       computed: {
-        unitLabel() {
-          return this.unit === 'metric'
-            ? { weight: 'kg', height: 'cm' }
-            : { weight: 'lb', height: 'ft' };
-        }
-      },
+         unitLabel() {
+    return this.unit === 'metric'
+      ? { weight: 'kg', height: 'cm' }
+      : { weight: 'lb', height: 'ft' };
+  },
+  bmiIndicatorPosition() {
+    if (!this.result || !this.result.bmi) return 0;
+    const bmi = this.result.bmi;
+
+    // Rentang BMI dari 10 (min) ke 40 (max) untuk skala
+    const min = 10;
+    const max = 40;
+    const clamped = Math.max(min, Math.min(max, bmi));
+    return ((clamped - min) / (max - min)) * 100;
+  }
+},
       methods: {
         async calculateBMI() {
           this.result = null;
           this.error = '';
+          if (!this.weight || !this.height) {
+            this.error = "Isi berat dan tinggi terlebih dahulu.";
+            return;
+          }
+
           try {
             const response = await fetch(`http://localhost:8000/api/bmi?weight=${this.weight}&height=${this.height}&unit=${this.unit}`);
             if (!response.ok) throw new Error(await response.text());
-            this.result = await response.json();
+            const data = await response.json();
+            this.result = data;
+
+            this.$nextTick(() => this.renderChart(data.bmi));
           } catch (err) {
             this.error = err.message || "Gagal menghitung BMI";
           }
+        },
+        renderChart(bmiValue) {
+          const maxBMI = 40;
+          if (this.chart) {
+            this.chart.destroy();
+          }
+          const ctx = document.getElementById('bmiChart').getContext('2d');
+          this.chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+              labels: ['BMI Anda', 'Sisa dari 40'],
+              datasets: [{
+                data: [bmiValue, maxBMI - bmiValue],
+                backgroundColor: ['#10B981', '#E5E7EB'],
+                borderWidth: 2,
+              }]
+            },
+            options: {
+              responsive: true,
+              cutout: '70%',
+              plugins: {
+                legend: { display: false },
+                tooltip: { enabled: true }
+              }
+            }
+          });
         }
       }
     }).mount('#app');

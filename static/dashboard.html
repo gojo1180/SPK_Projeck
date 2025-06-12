@@ -266,18 +266,42 @@
           </div>
         </section>
 
-        <!-- Konfigurasi Bobot -->
-        <section
-          v-if="activePage === 'bobot'"
-          class="space-y-4 animate-fade-in"
-        >
-          <h2 class="text-xl font-semibold text-gray-700">
-            ⚙️ Konfigurasi Bobot Kriteria
-          </h2>
-          <div class="text-gray-600">
-            Ini nanti akan menampilkan form pengaturan bobot.
+       <!-- Konfigurasi Bobot -->
+<section v-if="activePage === 'bobot'" class="space-y-4 animate-fade-in">
+  <h2 class="text-xl font-semibold text-gray-700">⚙️ Konfigurasi Bobot Kriteria</h2>
+
+  <div v-if="isLoadingBobot" class="text-gray-600">Memuat data bobot...</div>
+
+  <div v-else-if="bobotKonfigurasi" class="space-y-6">
+    <div v-for="(fase, faseKey) in bobotKonfigurasi" :key="faseKey" class="border p-4 rounded-lg shadow bg-white">
+      <h3 class="font-bold text-lg capitalize text-green-700">{{ faseKey }}</h3>
+      <div v-for="(waktu, waktuKey) in fase" :key="waktuKey" class="mt-2">
+        <h4 class="font-semibold text-gray-700 capitalize">{{ waktuKey }}</h4>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+          <div v-for="(nilai, kriteriaKey) in waktu" :key="kriteriaKey">
+            <label class="block text-sm font-medium text-gray-600">
+              {{ kriteriaKey }}
+              <input
+                type="number"
+                min="0"
+                max="5"
+                v-model.number="bobotKonfigurasi[faseKey][waktuKey][kriteriaKey]"
+                class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring focus:border-green-500"
+              />
+            </label>
           </div>
-        </section>
+        </div>
+      </div>
+    </div>
+
+    <button
+      @click="simpanBobotKonfigurasi"
+      class="mt-4 bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded shadow"
+    >
+      Simpan Bobot
+    </button>
+  </div>
+</section>
       </main>
     </div>
 
@@ -286,35 +310,72 @@
 
   createApp({
     data() {
-      return {
-        activePage: "makanan",
-        showModal: false,
-        expandedCardId: null,
-        selectedCard: null,
-        showEditModal: false,
-        form: {
-          nama: "",
-          deskripsi: "",
-          gambar: null,
-        },
-        editForm: {
-          id_makanan: null,
-          nama: "",
-          deskripsi: "",
-          gambar: null,
-        },
-        daftarMakanan: [],
-      };
+  return {
+    activePage: "makanan",
+    showModal: false,
+    expandedCardId: null,
+    selectedCard: null,
+    showEditModal: false,
+    form: {
+      nama: "",
+      deskripsi: "",
+      gambar: null,
     },
-    mounted() {
-      const token = localStorage.getItem("admin_token");
-      if (!token) {
-        window.location.href = "/loginadmin.html";
-      } else {
-        this.loadMakanan();
-      }
+    editForm: {
+      id_makanan: null,
+      nama: "",
+      deskripsi: "",
+      gambar: null,
     },
+    daftarMakanan: [],
+
+    // Tambahan untuk konfigurasi bobot
+    bobotKonfigurasi: null,
+    isLoadingBobot: false,
+  };
+},
+
+  mounted() {
+  const token = localStorage.getItem("admin_token");
+  if (!token) {
+    window.location.href = "/loginadmin.html";
+  } else {
+    this.loadMakanan();
+  }
+},
+watch: {
+  activePage(newPage) {
+    if (newPage === "bobot") {
+      this.loadBobotKonfigurasi();
+    }
+  }
+},
     methods: {
+      async loadConfig() {
+  try {
+    const token = localStorage.getItem("admin_token");
+    const response = await fetch("http://localhost:8000/admin/bobot-default/", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Gagal memuat konfigurasi");
+    }
+
+    const data = await response.json();
+    this.config = JSON.parse(JSON.stringify(data)); // Deep copy
+    this.defaultConfig = JSON.parse(JSON.stringify(data)); // Simpan untuk reset
+  } catch (error) {
+    console.error("Gagal memuat konfigurasi:", error.message);
+    Toastify({
+      text: "Gagal memuat konfigurasi",
+      duration: 3000,
+      backgroundColor: "#f44336",
+    }).showToast();
+  }
+},
       logout() {
         localStorage.removeItem("admin_token");
         window.location.href = "/static/loginadmin.html";
@@ -463,6 +524,55 @@
           console.error("Gagal memuat makanan:", error.message);
         }
       },
+      async loadBobotKonfigurasi() {
+  this.isLoadingBobot = true;
+  try {
+    const token = localStorage.getItem("admin_token");
+    const response = await fetch("http://localhost:8000/admin/bobot-default/", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error("Gagal memuat bobot");
+
+    const data = await response.json();
+    this.bobotKonfigurasi = data;
+  } catch (error) {
+    Toastify({
+      text: "Gagal memuat bobot: " + error.message,
+      duration: 3000,
+      backgroundColor: "#f44336",
+    }).showToast();
+  } finally {
+    this.isLoadingBobot = false;
+  }
+},
+async simpanBobotKonfigurasi() {
+  try {
+    const token = localStorage.getItem("admin_token");
+    const response = await fetch("http://localhost:8000/admin/bobot-default/", {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(this.bobotKonfigurasi),
+    });
+    if (!response.ok) throw new Error("Gagal menyimpan bobot");
+
+    Toastify({
+      text: "Bobot berhasil disimpan!",
+      duration: 3000,
+      backgroundColor: "#4CAF50",
+    }).showToast();
+  } catch (error) {
+    Toastify({
+      text: "Gagal menyimpan bobot: " + error.message,
+      duration: 3000,
+      backgroundColor: "#f44336",
+    }).showToast();
+  }
+},
     },
   }).mount("#app");
 </script>

@@ -10,6 +10,7 @@ class UserCreate(BaseModel):
     password: str
     email: EmailStr
     #fase_latihan: FaseLatihanEnum 
+    
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
