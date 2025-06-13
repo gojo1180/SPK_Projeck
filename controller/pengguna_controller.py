@@ -28,30 +28,28 @@ def register_user(db: Session, user_data: UserCreate):
     }
 
 def login_user(db: Session, credentials: UserLogin):
-
     user = db.query(Pengguna).filter(Pengguna.email == credentials.email).first()
 
     if not user or not security.verify_password(credentials.password, user.password_hash):
         return {"success": False, "message": "Email atau password salah."}
 
+    # Buat token JWT (string)
     access_token = security.create_access_token(
         data={"sub": user.email, "user_id": user.id_pengguna}
     )
 
+    # ⛔️ Jangan bungkus token dalam dict
     return {
-    "success": True,
-    "message": "Login berhasil.",
-    "token": {
-        "access_token": access_token,
-        "token_type": "bearer"
-    },
-    "user": {
-        "id_pengguna": user.id_pengguna,
-        "email": user.email,
-        "nama": user.nama,
-        #"fase_latihan": user.fase_latihan
+        "success": True,
+        "message": "Login berhasil.",
+        "token": access_token,  # ⬅️ Langsung token string
+        "user": {
+            "id_pengguna": user.id_pengguna,
+            "email": user.email,
+            "nama": user.nama
+        }
     }
-}
+
 
 def update_user(db: Session, user_id: int, user_update: UserUpdate):
     user = db.query(Pengguna).filter(Pengguna.id_pengguna == user_id).first()
@@ -75,4 +73,3 @@ def update_user(db: Session, user_id: int, user_update: UserUpdate):
     
     return {"success": True, "message": "Profil berhasil diperbarui.", "data": user}
 
- # Asumsikan kamu punya fungsi ini

@@ -1,35 +1,34 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+from typing import Dict, List
 
 from utils.DB import get_db
 from utils.security import get_current_user
 from model.user import Pengguna
-from schema import bobot_schemas
 from controller import preferensi_controller
 
+# Skema yang dibutuhkan dari bobot_schemas
+from schema.bobot_schemas import BobotResponse, BobotCreate, BobotBase 
+
 router = APIRouter(
-    prefix="/api/users/me/preferences", # Endpoint di bawah profil user
-    tags=["Preferensi Pengguna"],
-    dependencies=[Depends(get_current_user)] # Lindungi semua endpoint di sini
+    tags=["Preferensi Pengguna"]
 )
 
-@router.get("/", response_model=List[bobot_schemas.BobotResponse])
-def read_user_preferences(
+# Endpoint GET untuk mengambil preferensi
+@router.get("/api/users/me/preferences", response_model=List[BobotResponse])
+def get_user_preferences_api(
     db: Session = Depends(get_db),
     current_user: Pengguna = Depends(get_current_user)
 ):
-    """Mendapatkan daftar preferensi bobot kustom milik pengguna yang sedang login."""
-    return preferensi_controller.get_user_preferences(db, user_id=current_user.id_pengguna)
+    # PERBAIKAN: Panggil nama fungsi yang benar dari controller
+    return preferensi_controller.get_user_preferences(db, current_user.id_pengguna)
 
-@router.put("/", response_model=List[bobot_schemas.BobotResponse])
-def update_user_preferences(
-    preferences_data: bobot_schemas.BobotCreate,
+# Endpoint PUT untuk memperbarui preferensi
+@router.put("/api/users/me/preferences", response_model=List[BobotResponse])
+def update_user_preferences_api(
+    preferences_data: BobotCreate, # Menggunakan skema BobotCreate untuk menerima data
     db: Session = Depends(get_db),
     current_user: Pengguna = Depends(get_current_user)
 ):
-    """
-    Mengatur (membuat atau menimpa) preferensi bobot kustom untuk pengguna
-    yang sedang login.
-    """
-    return preferensi_controller.set_user_preferences(db, user_id=current_user.id_pengguna, preferences_data=preferences_data)
+    # PERBAIKAN: Panggil nama fungsi yang benar dari controller
+    return preferensi_controller.set_user_preferences(db, current_user.id_pengguna, preferences_data)
