@@ -5,12 +5,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rekomendasi Makanan - HealthyGym</title>
+  
   <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  
   <style>
+    /* Gaya kustom Anda dipertahankan */
     .card:hover {
       transform: perspective(1000px) rotateX(2deg) rotateY(2deg) scale(1.03);
       transition: all 0.4s ease;
@@ -22,25 +27,30 @@
       backdrop-filter: blur(12px);
       box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     }
+    
+    /* Transisi untuk Vue */
+    .fade-enter-active,
+    .fade-leave-active {
+      transition: opacity 0.4s ease-out;
+    }
+
+    .fade-enter-from,
+    .fade-leave-to {
+      opacity: 0;
+    }
   </style>
 </head>
 
 <body class="bg-gradient-to-b from-green-50 to-white min-h-screen font-sans">
-  <!-- Navbar -->
   <div id="app">
-    <!-- Navbar -->
     <nav class="bg-white shadow-md sticky top-0 z-50">
       <div class="container mx-auto px-4 py-4 flex items-center justify-between">
         <h1 class="text-2xl font-bold text-green-600">HealthyGym</h1>
-        <!-- Dropdown toggle -->
         <button @click="showMenu = !showMenu" class="md:hidden focus:outline-none">
-          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-            stroke-linecap="round" stroke-linejoin="round">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-
-        <!-- Menu desktop -->
         <ul class="hidden md:flex gap-6 items-center">
           <li><a href="index.html" class="hover:text-green-600 font-medium">Home</a></li>
           <li><a href="rekomendasi.html" class="hover:text-green-600 font-medium">Makanan</a></li>
@@ -51,189 +61,216 @@
           <li v-else><a href="login.html" class="hover:text-green-600 font-medium">Login</a></li>
         </ul>
       </div>
-
-      <!-- Dropdown menu mobile -->
-      <transition name="fade-slide">
+      <transition name="fade">
         <ul v-show="showMenu" class="md:hidden px-4 pb-4 space-y-2">
-          <li><a href="index.html" class="block py-2 text-green-600">Home</a></li>
-          <li><a href="rekomendasi.html" class="block py-2 text-green-600">Makanan</a></li>
-          <li><a href="about us.html" class="block py-2 text-green-600">Tentang</a></li>
-          <li><a href="contact.html" class="block py-2 text-green-600">Kontak</a></li>
-          <li v-if="isLoggedIn"><a href="profile.html" class="block py-2 text-green-600">Profile</a></li>
-          <li v-if="isLoggedIn"><button @click="logout" class="block py-2 text-green-600">Logout</button></li>
-          <li v-else><a href="login.html" class="block py-2 text-green-600">Login</a></li>
-        </ul>
+          </ul>
       </transition>
     </nav>
 
-    <div id="app" class="max-w-7xl mx-auto px-6 py-10">
-      <h1 class="text-4xl font-extrabold text-center mb-10 text-green-800">🍽️ Rekomendasi Makanan Sehat</h1>
+    <main class="max-w-7xl mx-auto px-6 py-10">
+      <h1 class="text-4xl font-extrabold text-center mb-10 text-green-800">
+        <i class="fas fa-utensils mr-3"></i>Dapatkan Rekomendasi Makanan
+      </h1>
+      
+      <div v-if="selectionMode" class="text-center mb-6">
+        <button @click="resetSelection" class="text-sm font-semibold text-green-600 hover:text-green-800 transition">
+          &larr; Kembali dan pilih mode lain
+        </button>
+      </div>
 
-      <!-- Form Pilihan -->
-      <form @submit.prevent="fetchRekomendasi" class="mb-8 grid sm:grid-cols-2 gap-6 bg-white p-6 rounded-2xl shadow">
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">Fase Latihan</label>
-          <select v-model="fase_latihan"
-            class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500">
-            <option value="bulking">Bulking</option>
-            <option value="cutting">Cutting</option>
-            <option value="maintenance">Maintenance</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">Waktu</label>
-          <select v-model="timing"
-            class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500">
-            <option value="pre_workout">Pre-Workout</option>
-            <option value="post_workout">Post-Workout</option>
-          </select>
-        </div>
-        <div class="col-span-2 text-center">
-          <button
-            class="bg-gradient-to-r from-green-600 to-green-800 text-white px-8 py-3 rounded-xl font-medium hover:scale-105 transition transform duration-300 shadow-md">
-            🔍 Lihat Rekomendasi
-          </button>
-        </div>
-      </form>
-
-      <!-- Form Preferensi -->
-      <div class="glass rounded-2xl p-6 mb-10">
-        <h2 class="text-2xl font-semibold text-green-700 mb-6">⚙️ Atur Bobot Preferensi</h2>
-        <form @submit.prevent="updatePreferensi" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div v-for="(value, key) in preferensi" :key="key">
-            <label class="block text-sm font-medium text-gray-800 mb-1 capitalize">{{ key.replace('_', ' ') }}</label>
-            <input type="number" min="1" max="5" v-model.number="preferensi[key]"
-              class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400">
+      <transition name="fade" mode="out-in">
+        <div v-if="!selectionMode" class="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto" data-aos="fade-in">
+          <div @click="selectionMode = 'preset'" class="cursor-pointer text-center bg-white p-8 rounded-2xl shadow-lg border-2 border-transparent hover:border-green-500 transition-all duration-300 transform hover:-translate-y-1">
+            <h2 class="text-2xl font-bold text-gray-800 mb-3">Gunakan Preset</h2>
+            <p class="text-gray-600">Pilihan cepat berdasarkan fase latihan Anda. Kami yang akan menentukan bobot terbaik.</p>
           </div>
-          <div class="md:col-span-3 text-center mt-4">
-            <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">💾 Simpan
-              Preferensi</button>
+          <div @click="selectionMode = 'customize'" class="cursor-pointer text-center bg-white p-8 rounded-2xl shadow-lg border-2 border-transparent hover:border-blue-500 transition-all duration-300 transform hover:-translate-y-1">
+            <h2 class="text-2xl font-bold text-gray-800 mb-3">Atur Kustom</h2>
+            <p class="text-gray-600">Dapatkan hasil personal dengan mengatur prioritas bobot sesuai preferensi Anda.</p>
+          </div>
+        </div>
+      </transition>
+      
+      <div v-if="selectionMode === 'preset'" data-aos="slide-up" data-aos-duration="500">
+        <form @submit.prevent="fetchRekomendasi" class="mb-8 grid sm:grid-cols-2 gap-6 bg-white p-8 rounded-2xl shadow-xl max-w-3xl mx-auto">
+          <h2 class="sm:col-span-2 text-2xl font-bold text-center text-gray-800 mb-4">Mode Preset</h2>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Fase Latihan Anda</label>
+            <select v-model="fase_latihan" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500">
+              <option value="bulking">Bulking</option>
+              <option value="cutting">Cutting</option>
+              <option value="maintenance">Maintenance</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Waktu Makan</label>
+            <select v-model="timing" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500">
+              <option value="pre_workout">Pre-Workout</option>
+              <option value="post_workout">Post-Workout</option>
+            </select>
+          </div>
+          <div class="col-span-2 text-center mt-4">
+            <button class="bg-gradient-to-r from-green-600 to-green-800 text-white px-8 py-3 rounded-xl font-medium hover:scale-105 transition transform duration-300 shadow-md">
+              <i class="fas fa-search mr-2"></i>Lihat Rekomendasi
+            </button>
           </div>
         </form>
       </div>
 
-      <!-- Rekomendasi -->
-      <div>
-        <h2 class="text-2xl font-bold text-green-700 mb-6">🔥 Hasil Rekomendasi</h2>
+      <div v-if="selectionMode === 'customize'" class="glass rounded-2xl p-8 mb-10 max-w-3xl mx-auto shadow-xl" data-aos="slide-up" data-aos-duration="500">
+        <h2 class="text-2xl font-semibold text-center text-green-700 mb-6"><i class="fas fa-sliders-h mr-2"></i>Mode Kustom</h2>
+        <form @submit.prevent="handleCustomSubmit">
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div v-for="(value, key) in preferensi" :key="key">
+              <label class="block text-sm font-medium text-gray-800 mb-1 capitalize">{{ key.replace('C', 'Kriteria ') }}</label>
+              <input type="number" min="1" max="5" v-model.number="preferensi[key]" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400">
+            </div>
+          </div>
+          <div class="mt-6">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Waktu Makan</label>
+            <select v-model="timing" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="pre_workout">Pre-Workout</option>
+              <option value="post_workout">Post-Workout</option>
+            </select>
+          </div>
+          <div class="text-center mt-8">
+            <button class="bg-blue-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-blue-700 transition shadow-md">
+                <i class="fas fa-save mr-2"></i>Simpan & Lihat Rekomendasi
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div v-if="isLoading" class="text-center py-10">
+        <p class="text-lg font-semibold text-gray-700">Mencari rekomendasi terbaik untuk Anda...</p>
+      </div>
+
+      <div v-if="rekomendasi.length > 0 && !isLoading" data-aos="fade-up" data-aos-offset="200">
+        <h2 class="text-2xl font-bold text-green-700 mb-6 mt-12 text-center"><i class="fas fa-fire-alt mr-2"></i>Hasil Rekomendasi</h2>
         <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-          <div v-for="item in rekomendasi" :key="item.id"
-            class="card bg-white rounded-2xl overflow-hidden shadow-lg transform transition hover:scale-105 hover:shadow-2xl">
+          <div v-for="item in rekomendasi" :key="item.id" class="card bg-white rounded-2xl overflow-hidden shadow-lg">
             <img :src="item.gambar" alt="Makanan" class="w-full h-40 object-cover">
             <div class="p-4">
               <h3 class="text-xl font-semibold text-green-700">{{ item.nama }}</h3>
               <p class="text-sm text-gray-600 my-2">{{ item.penjelasan }}</p>
-              <div class="text-sm text-gray-700 font-medium">Skor: <span class="text-green-600 font-bold">{{
-                  item.skor.toFixed(4) }}</span></div>
+              <div class="text-sm text-gray-700 font-medium pt-3 mt-3 border-t">Skor: <span class="text-green-600 font-bold">{{ item.skor.toFixed(4) }}</span></div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <script>
-      const { createApp } = Vue;
+    </main>
+  </div>
 
-      // PERBAIKAN 1: Definisikan alamat backend di satu tempat
-      const API_BASE_URL = "http://localhost:8000";
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    const { createApp } = Vue;
+    const API_BASE_URL = "http://localhost:8000";
 
-      createApp({
-        data() {
-          return {
-            user: null,
-            isLoggedIn: false,
-            showMenu: false, // Untuk dropdown menu mobile
-            fase_latihan: 'bulking',
-            timing: 'pre_workout',
-            preferensi: {},
-            rekomendasi: []
-          };
+    createApp({
+      data() {
+        return {
+          selectionMode: null, 
+          user: null,
+          isLoggedIn: false,
+          showMenu: false, 
+          fase_latihan: 'bulking',
+          timing: 'pre_workout',
+          rekomendasi: [],
+          isLoading: false, 
+          preferensi: { "C1": 3, "C2": 3, "C3": 3, "C4": 3, "C5": 3 }
+        };
+      },
+      mounted() {
+        this.checkLoginSession();
+        if (this.isLoggedIn) {
+          this.getPreferensi();
+        }
+        AOS.init({ once: true });
+      },
+      methods: {
+        resetSelection() {
+          this.selectionMode = null;
+          this.rekomendasi = [];
         },
-        mounted() {
-          this.checkLoginSession();
-          // Hanya panggil getPreferensi jika user sudah login
-          if (this.isLoggedIn) {
-            this.getPreferensi();
+        async handleCustomSubmit() {
+          await this.updatePreferensi();
+          await this.fetchRekomendasi();
+        },
+        checkLoginSession() {
+          const token = localStorage.getItem("authToken");
+          if (token) {
+            this.isLoggedIn = true;
+            this.user = JSON.parse(localStorage.getItem("user"));
+          } else {
+            this.isLoggedIn = false;
           }
         },
-        methods: {
-          checkLoginSession() {
-            // PERBAIKAN 2: Gunakan 'authToken' secara konsisten
-            const token = localStorage.getItem("authToken");
-            if (token) {
-              this.isLoggedIn = true;
-              this.user = JSON.parse(localStorage.getItem("user")); // Ambil juga data user
-            } else {
-              this.isLoggedIn = false;
+        logout() {
+          localStorage.removeItem("authToken");
+          localStorage.removeItem("user");
+          window.location.href = "login.html";
+        },
+        async fetchRekomendasi() {
+          if (!this.isLoggedIn) {
+            alert('Anda harus login terlebih dahulu.');
+            window.location.href = 'login.html';
+            return;
+          }
+          this.isLoading = true;
+          this.rekomendasi = [];
+          try {
+            const url = `${API_BASE_URL}/api/rekomendasi?fase_latihan=${this.fase_latihan}&timing=${this.timing}`;
+            const res = await axios.get(url, {
+              headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') }
+            });
+            this.rekomendasi = res.data;
+            if (res.data.length === 0) {
+              alert('Tidak ada rekomendasi yang cocok ditemukan.');
             }
-          },
-          logout() {
-            localStorage.removeItem("authToken");
-            localStorage.removeItem("user");
-            this.isLoggedIn = false;
-            this.user = null;
-            window.location.href = "login.html";
-          },
-
-          async fetchRekomendasi() {
-            if (!this.isLoggedIn) {
-              alert('Anda harus login terlebih dahulu untuk mendapatkan rekomendasi.');
-              window.location.href = 'login.html';
-              return;
+          } catch (err) {
+            console.error("Error fetching recommendations:", err);
+            alert('❌ Gagal mengambil rekomendasi.');
+          } finally {
+            this.isLoading = false;
+          }
+        },
+        async getPreferensi() {
+          if (!this.isLoggedIn) return;
+          try {
+            const res = await axios.get(`${API_BASE_URL}/api/users/me/preferences`, {
+              headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') }
+            });
+            const prefsObject = res.data.reduce((acc, item) => {
+              acc['C' + item.id_kriteria] = item.bobot;
+              return acc;
+            }, {});
+            if (Object.keys(prefsObject).length > 0) {
+              this.preferensi = prefsObject;
             }
-            try {
-              // PERBAIKAN 3: Gunakan URL absolut dan kirim semua parameter
-              const url = `${API_BASE_URL}/api/rekomendasi?fase_latihan=${this.fase_latihan}&timing=${this.timing}`;
-              const res = await axios.get(url, {
-                headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') } // <-- Kunci yang benar
-              });
-              this.rekomendasi = res.data;
-              if (res.data.length === 0) {
-                alert('Tidak ada rekomendasi yang cocok ditemukan.');
-              }
-            } catch (err) {
-              console.error(err); // Tampilkan error di console untuk debug
-              alert('❌ Gagal mengambil rekomendasi. Pastikan backend Anda berjalan.');
-            }
-          },
-
-          async getPreferensi() {
-            try {
-              // PERBAIKAN 3: Gunakan URL absolut
-              const res = await axios.get(`${API_BASE_URL}/api/users/me/preferences`, {
-                headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') } // <-- Kunci yang benar
-              });
-              if (Object.keys(res.data).length > 0) {
-                this.preferensi = res.data;
-              } else {
-                // Jika backend mengembalikan data kosong, inisialisasi dengan nilai default
-                this.preferensi = { C1: 3, C2: 3, C3: 3, C4: 3, C5: 3 }; // Sesuaikan dengan kriteria Anda
-              }
-            } catch (err) {
-              console.error(err); // Tampilkan error di console untuk debug
-              alert('⚠️ Gagal mengambil preferensi. Menggunakan default bobot.');
-              // Inisialisasi jika gagal
-              this.preferensi = { C1: 3, C2: 3, C3: 3, C4: 3, C5: 3 }; // Sesuaikan dengan kriteria Anda
-            }
-          },
-
-          async updatePreferensi() {
-            if (!this.isLoggedIn) {
-              alert('Anda harus login terlebih dahulu untuk menyimpan preferensi.');
-              return;
-            }
-            try {
-              // PERBAIKAN 3: Gunakan URL absolut
-              await axios.put(`${API_BASE_URL}/api/users/me/preferences`, this.preferensi, {
-                headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') } // <-- Kunci yang benar
-              });
-              alert('✅ Preferensi berhasil diperbarui!');
-            } catch (err) {
-              console.error(err); // Tampilkan error di console untuk debug
-              alert('❌ Gagal memperbarui preferensi');
-            }
+          } catch (err) {
+            console.error("Error fetching preferences:", err);
+          }
+        },
+        async updatePreferensi() {
+          if (!this.isLoggedIn) return;
+          try {
+            const payload = {
+              preferences: Object.keys(this.preferensi).map(key => ({
+                id_kriteria: parseInt(key.replace('C', '')),
+                bobot: this.preferensi[key]
+              }))
+            };
+            await axios.put(`${API_BASE_URL}/api/users/me/preferences`, payload, {
+              headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') }
+            });
+          } catch (err) {
+            console.error("Error updating preferences:", err);
+            alert('❌ Gagal memperbarui preferensi');
           }
         }
-      }).mount('#app')
-    </script>
+      }
+    }).mount('#app')
+  </script>
 </body>
 
 </html>
