@@ -210,7 +210,7 @@
           localStorage.removeItem("user");
           window.location.href = "login.html";
         },
-    async fetchRekomendasi() {
+        async fetchRekomendasi() {
       if (!this.isLoggedIn) {
         alert('Anda harus login terlebih dahulu.');
         window.location.href = 'login.html';
@@ -233,21 +233,23 @@
           return;
         }
 
-        // ✅ TAMBAHKAN: Simpan hasil SPK ke database
+        // ✅ Tambahkan fase_latihan dan waktu_makan ke hasil SPK
         const hasilSPK = res.data.map((item, index) => ({
-          id_makanan: item.id_makanan || item.makanan?.id_makanan, // coba sesuaikan
+          id_makanan: item.id ?? item.id_makanan ?? item.makanan?.id_makanan,
           skor_total: item.skor,
-          ranking: index + 1
+          ranking: index + 1,
+          fase_latihan: this.fase_latihan,
+          waktu_makan: this.timing
         }));
 
         console.log("Payload hasilSPK:", hasilSPK);
 
         await axios.post(`${API_BASE_URL}/api/spk/simpan`, hasilSPK, {
-        headers: {
-          "Authorization": 'Bearer ' + localStorage.getItem('authToken'),
-          "Content-Type": "application/json"
-        }
-      });
+          headers: {
+            "Authorization": 'Bearer ' + localStorage.getItem('authToken'),
+            "Content-Type": "application/json"
+          }
+        });
 
       } catch (err) {
         console.error("❌ Error fetching or saving SPK results:", err);

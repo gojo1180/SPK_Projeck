@@ -1,5 +1,5 @@
 # app/models/hasil.py
-from sqlalchemy import Column, Integer, Float, ForeignKey, DateTime, func, String, DateTime
+from sqlalchemy import Column, Integer, Float, ForeignKey, DateTime, func, String, DateTime, Text
 from sqlalchemy.orm import relationship
 from utils.DB import Base
 from datetime import datetime
@@ -13,6 +13,8 @@ class Hasil(Base):
     skor_total = Column(Float)
     ranking = Column(Integer)
     tanggal_rekomendasi = Column(DateTime(timezone=True), server_default=func.now())
+    fase_latihan = Column(Text)
+    waktu_makan = Column(Text)
 
 
     # Relationships
