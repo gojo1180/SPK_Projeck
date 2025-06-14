@@ -59,7 +59,7 @@ def get_recommendations(db: Session, current_user: Pengguna, timing: str, fase_l
             gambar_base64 = f"data:image/jpeg;base64,{base64.b64encode(alt.gambar).decode('utf-8')}"
 
         scored_results.append({
-            "id": alt.id_makanan,
+            "id_makanan": alt.id_makanan,
             "nama": alt.nama,
             "penjelasan": alt.deskripsi, # Menggunakan 'deskripsi'
             "gambar": gambar_base64,     # Menggunakan gambar yang sudah di-encode

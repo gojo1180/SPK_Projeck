@@ -26,3 +26,11 @@ class MakananOut(BaseModel):
 
     class Config:
         orm_mode = True
+
+class MakananSkor(BaseModel):
+    id_makanan: int
+    nama: str
+    skor: float
+
+    class Config:
+        orm_mode = True

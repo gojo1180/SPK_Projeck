@@ -178,6 +178,26 @@
   </div>
 </section>
 
+<!-- Section Histori Rekomendasi Makanan -->
+<section class="py-16 px-6 md:px-20 bg-gradient-to-b from-green-50 to-white">
+  <div class="max-w-7xl mx-auto text-center">
+    <h2 class="text-4xl font-extrabold text-green-700 mb-4">Riwayat Rekomendasi Kamu</h2>
+    <p class="text-gray-600 mb-10">Lihat rekomendasi makanan sehat yang pernah kamu dapatkan berdasarkan hasil SPK.</p>
+
+    <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+      <div v-for="item in histori" :key="item.id_hasil" class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-2 hover:scale-[1.03] hover:rotate-[1deg]">
+        <img :src="item.gambar" alt="Gambar Makanan" class="w-full h-48 object-cover rounded-t-2xl">
+        <div class="p-5 text-left">
+          <h3 class="text-xl font-semibold text-green-700 mb-1 line-clamp-2">{{ item.nama_makanan }}</h3>
+          <p class="text-gray-500 text-sm mb-2">Ranking: <span class="font-semibold text-green-600">#{{ item.ranking }}</span></p>
+          <p class="text-gray-400 text-xs">Direkomendasikan: {{ formatTanggal(item.tanggal_rekomendasi) }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
 <section class="py-16 bg-gray-50">
   <div class="text-center mb-12">
     <h2 class="text-3xl font-bold">WHY CHOOSE US?</h2>
@@ -476,19 +496,21 @@
   createApp({
     data() {
       return {
-        user: null,         // menyimpan data user
-        isLoggedIn: false   // status login
+        user: null,
+        isLoggedIn: false,
+        histori: []  // TAMBAHAN: untuk menyimpan histori rekomendasi
       };
     },
     mounted() {
       this.checkLoginSession();
+      this.fetchHistori();  // TAMBAHAN: ambil histori saat komponen mount
     },
     methods: {
       checkLoginSession() {
-        const token = localStorage.getItem("authToken");  // ambil token
+        const token = localStorage.getItem("authToken");
         if (token) {
           this.isLoggedIn = true;
-          this.user = { token }; // kamu bisa fetch data user lebih lanjut jika butuh
+          this.user = { token };
         } else {
           this.isLoggedIn = false;
         }
@@ -498,12 +520,32 @@
         this.isLoggedIn = false;
         this.user = null;
         window.location.href = "login.html";
+      },
+      async fetchHistori() {
+        try {
+          const token = localStorage.getItem("authToken");
+          const response = await fetch("http://localhost:8000/api/spk/histori", {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          const data = await response.json();
+          this.histori = data;
+        } catch (error) {
+          console.error("Gagal mengambil histori SPK:", error);
+        }
+      },
+      formatTanggal(tanggal) {
+        const date = new Date(tanggal);
+        return date.toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "long",
+          year: "numeric"
+        });
       }
     }
   }).mount("#app");
 </script>
-
-
 
 </body>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>

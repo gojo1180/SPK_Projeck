@@ -4,7 +4,7 @@ from utils.DB import Base, engine
 
 
 from routes.admin import admin_auth, admin_makanan, admin_config
-from routes import pengguna_routes, rekomendasi_routes, preferensi_routes,bmi_routes
+from routes import pengguna_routes, rekomendasi_routes, preferensi_routes,bmi_routes, spk_routes
 
 Base.metadata.create_all(bind=engine)
 
@@ -25,6 +25,7 @@ app.add_middleware(
 )
 
 print("Mendaftarkan router...")
+app.include_router(spk_routes.router)
 app.include_router(bmi_routes.router)
 app.include_router(admin_auth.router)
 app.include_router(admin_makanan.router) 
