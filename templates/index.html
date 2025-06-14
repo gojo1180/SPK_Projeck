@@ -201,6 +201,7 @@
 </section>
 
 
+
 <section class="py-16 bg-gray-50">
   <div class="text-center mb-12">
     <h2 class="text-3xl font-bold">WHY CHOOSE US?</h2>
@@ -559,16 +560,20 @@
           minute: "2-digit"
         });
       },
-      formatGroupKey(key) {
-        const [fase, waktu] = key.split("__");
-        const labelFase = fase.charAt(0).toUpperCase() + fase.slice(1);
-        const labelWaktu = waktu.replace("_", " ");
-        return `Fase: ${labelFase} • Waktu: ${labelWaktu}`;
+     formatGroupKey(key) {
+    const [timestamp, fase, waktu] = key.split("__");
+    const waktuFormatted = new Date(timestamp).toLocaleString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+    return `${waktuFormatted} • Fase: ${fase.charAt(0).toUpperCase() + fase.slice(1)} • Waktu: ${waktu.replace("_", " ")}`;
       }
     }
   }).mount("#app");
 </script>
-
 
 
 </body>

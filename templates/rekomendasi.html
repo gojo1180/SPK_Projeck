@@ -162,139 +162,144 @@
   </div>
 
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>
-    const { createApp } = Vue;
-    const API_BASE_URL = "http://localhost:8000";
+<script>
+  const { createApp } = Vue;
+  const API_BASE_URL = "http://localhost:8000";
 
-    createApp({
-      data() {
-        return {
-          selectionMode: null, 
-          user: null,
-          isLoggedIn: false,
-          showMenu: false, 
-          fase_latihan: 'bulking',
-          timing: 'pre_workout',
-          rekomendasi: [],
-          isLoading: false, 
-          preferensi: { "C1": 3, "C2": 3, "C3": 3, "C4": 3, "C5": 3 }
-        };
-      },
-      mounted() {
-        this.checkLoginSession();
-        if (this.isLoggedIn) {
-          this.getPreferensi();
-        }
-        AOS.init({ once: true });
-      },
-      methods: {
-        resetSelection() {
-          this.selectionMode = null;
-          this.rekomendasi = [];
-        },
-        async handleCustomSubmit() {
-          await this.updatePreferensi();
-          await this.fetchRekomendasi();
-        },
-        checkLoginSession() {
-          const token = localStorage.getItem("authToken");
-          if (token) {
-            this.isLoggedIn = true;
-            this.user = JSON.parse(localStorage.getItem("user"));
-          } else {
-            this.isLoggedIn = false;
-          }
-        },
-        logout() {
-          localStorage.removeItem("authToken");
-          localStorage.removeItem("user");
-          window.location.href = "login.html";
-        },
-        async fetchRekomendasi() {
-      if (!this.isLoggedIn) {
-        alert('Anda harus login terlebih dahulu.');
-        window.location.href = 'login.html';
-        return;
+  createApp({
+    data() {
+      return {
+        selectionMode: null, // "preset" atau "custom"
+        user: null,
+        isLoggedIn: false,
+        showMenu: false, 
+        fase_latihan: 'bulking',
+        timing: 'pre_workout',
+        rekomendasi: [],
+        isLoading: false, 
+        preferensi: { "C1": 3, "C2": 3, "C3": 3, "C4": 3, "C5": 3 }
+      };
+    },
+    mounted() {
+      this.checkLoginSession();
+      if (this.isLoggedIn) {
+        this.getPreferensi();
       }
-
-      this.isLoading = true;
-      this.rekomendasi = [];
-
-      try {
-        const url = `${API_BASE_URL}/api/rekomendasi?fase_latihan=${this.fase_latihan}&timing=${this.timing}`;
-        const res = await axios.get(url, {
-          headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') }
-        });
-
-        this.rekomendasi = res.data;
-
-        if (res.data.length === 0) {
-          alert('Tidak ada rekomendasi yang cocok ditemukan.');
+      AOS.init({ once: true });
+    },
+    methods: {
+      resetSelection() {
+        this.selectionMode = null;
+        this.rekomendasi = [];
+      },
+      async handleCustomSubmit() {
+        this.selectionMode = "custom";
+        await this.updatePreferensi();
+        await this.fetchRekomendasi();
+      },
+      async handlePresetSubmit() {
+        this.selectionMode = "preset";
+        await this.fetchRekomendasi();
+      },
+      checkLoginSession() {
+        const token = localStorage.getItem("authToken");
+        if (token) {
+          this.isLoggedIn = true;
+          this.user = JSON.parse(localStorage.getItem("user"));
+        } else {
+          this.isLoggedIn = false;
+        }
+      },
+      logout() {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        window.location.href = "login.html";
+      },
+      async fetchRekomendasi() {
+        if (!this.isLoggedIn) {
+          alert('Anda harus login terlebih dahulu.');
+          window.location.href = 'login.html';
           return;
         }
 
-        // ✅ Tambahkan fase_latihan dan waktu_makan ke hasil SPK
-        const hasilSPK = res.data.map((item, index) => ({
-          id_makanan: item.id ?? item.id_makanan ?? item.makanan?.id_makanan,
-          skor_total: item.skor,
-          ranking: index + 1,
-          fase_latihan: this.fase_latihan,
-          waktu_makan: this.timing
-        }));
+        this.isLoading = true;
+        this.rekomendasi = [];
 
-        console.log("Payload hasilSPK:", hasilSPK);
+        try {
+          const url = `${API_BASE_URL}/api/rekomendasi?fase_latihan=${this.fase_latihan}&timing=${this.timing}`;
+          const res = await axios.get(url, {
+            headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') }
+          });
 
-        await axios.post(`${API_BASE_URL}/api/spk/simpan`, hasilSPK, {
-          headers: {
-            "Authorization": 'Bearer ' + localStorage.getItem('authToken'),
-            "Content-Type": "application/json"
+          this.rekomendasi = res.data;
+
+          if (res.data.length === 0) {
+            alert('Tidak ada rekomendasi yang cocok ditemukan.');
+            return;
           }
-        });
 
-      } catch (err) {
-        console.error("❌ Error fetching or saving SPK results:", err);
-        alert('❌ Gagal mengambil rekomendasi atau menyimpan hasil.');
-      } finally {
-        this.isLoading = false;
-      }
-        },
-        async getPreferensi() {
-          if (!this.isLoggedIn) return;
-          try {
-            const res = await axios.get(`${API_BASE_URL}/api/users/me/preferences`, {
-              headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') }
-            });
-            const prefsObject = res.data.reduce((acc, item) => {
-              acc['C' + item.id_kriteria] = item.bobot;
-              return acc;
-            }, {});
-            if (Object.keys(prefsObject).length > 0) {
-              this.preferensi = prefsObject;
+          const hasilSPK = res.data.map((item, index) => ({
+            id_makanan: item.id ?? item.id_makanan ?? item.makanan?.id_makanan,
+            skor_total: item.skor,
+            ranking: index + 1,
+            fase_latihan: this.fase_latihan,
+            waktu_makan: this.timing,
+            mode_penggunaan: this.selectionMode ?? "preset" // ✅ default fallback ke preset
+          }));
+
+          console.log("Payload hasilSPK:", hasilSPK);
+
+          await axios.post(`${API_BASE_URL}/api/spk/simpan`, hasilSPK, {
+            headers: {
+              "Authorization": 'Bearer ' + localStorage.getItem('authToken'),
+              "Content-Type": "application/json"
             }
-          } catch (err) {
-            console.error("Error fetching preferences:", err);
+          });
+
+        } catch (err) {
+          console.error("❌ Error fetching or saving SPK results:", err);
+          alert('❌ Gagal mengambil rekomendasi atau menyimpan hasil.');
+        } finally {
+          this.isLoading = false;
+        }
+      },
+      async getPreferensi() {
+        if (!this.isLoggedIn) return;
+        try {
+          const res = await axios.get(`${API_BASE_URL}/api/users/me/preferences`, {
+            headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') }
+          });
+          const prefsObject = res.data.reduce((acc, item) => {
+            acc['C' + item.id_kriteria] = item.bobot;
+            return acc;
+          }, {});
+          if (Object.keys(prefsObject).length > 0) {
+            this.preferensi = prefsObject;
           }
-        },
-        async updatePreferensi() {
-          if (!this.isLoggedIn) return;
-          try {
-            const payload = {
-              preferences: Object.keys(this.preferensi).map(key => ({
-                id_kriteria: parseInt(key.replace('C', '')),
-                bobot: this.preferensi[key]
-              }))
-            };
-            await axios.put(`${API_BASE_URL}/api/users/me/preferences`, payload, {
-              headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') }
-            });
-          } catch (err) {
-            console.error("Error updating preferences:", err);
-            alert('❌ Gagal memperbarui preferensi');
-          }
+        } catch (err) {
+          console.error("Error fetching preferences:", err);
+        }
+      },
+      async updatePreferensi() {
+        if (!this.isLoggedIn) return;
+        try {
+          const payload = {
+            preferences: Object.keys(this.preferensi).map(key => ({
+              id_kriteria: parseInt(key.replace('C', '')),
+              bobot: this.preferensi[key]
+            }))
+          };
+          await axios.put(`${API_BASE_URL}/api/users/me/preferences`, payload, {
+            headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') }
+          });
+        } catch (err) {
+          console.error("Error updating preferences:", err);
+          alert('❌ Gagal memperbarui preferensi');
         }
       }
-    }).mount('#app')
-  </script>
+    }
+  }).mount('#app')
+</script>
 </body>
 
 </html>

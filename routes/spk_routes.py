@@ -78,7 +78,7 @@ def get_histori_spk(
 @router.get("/api/spk/histori/group")
 def get_histori_grouped(
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user=Depends(get_current_user)
 ):
     hasil = (
         db.query(
@@ -100,7 +100,9 @@ def get_histori_grouped(
 
     grouped = {}
     for row in hasil:
-        key = f"{row.fase_latihan}__{row.waktu_makan}"
+        timestamp = row.tanggal_rekomendasi.strftime('%Y-%m-%d %H:%M:%S')
+        key = f"{timestamp}__{row.fase_latihan}__{row.waktu_makan}"
+
         if key not in grouped:
             grouped[key] = []
 
@@ -118,8 +120,5 @@ def get_histori_grouped(
             "tanggal_rekomendasi": row.tanggal_rekomendasi
         })
 
-    # Pastikan setiap grup diurutkan berdasarkan ranking
-    for key in grouped:
-        grouped[key] = sorted(grouped[key], key=lambda x: x['ranking'])
-
     return grouped
+

@@ -4,6 +4,8 @@ from sqlalchemy.orm import relationship
 from utils.DB import Base
 from datetime import datetime
 
+mode_penggunaan = Column(String, default="preset")
+
 class Hasil(Base):
     __tablename__ = "hasil"
 
