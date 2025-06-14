@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>BMI Calculator</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <title>BMI Calculator - HealthyGym</title>
+  <script src="https://unpkg.com/vue@3"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
   <style>
@@ -16,87 +16,123 @@
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-green-100 to-blue-100 min-h-screen flex items-center justify-center px-4">
-  <div id="app" class="max-w-lg w-full bg-white p-8 rounded-2xl shadow-2xl card-3d transition-all duration-500">
-    <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">BMI Calculator</h1>
+<body class="bg-gray-50 text-gray-800">
 
-    <form @submit.prevent="calculateBMI" class="space-y-4">
-      <div>
-        <label class="block font-semibold text-gray-700">Berat Badan ({{ unitLabel.weight }}):</label>
-        <input type="number" v-model="weight" required min="1"
-          class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400" />
+  <div id="app">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+      <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-green-600">HealthyGym</h1>
+        <button @click="showMenu = !showMenu" class="md:hidden focus:outline-none">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+        <ul class="hidden md:flex gap-6 items-center">
+          <li><a href="index.html" class="hover:text-green-600 font-medium">Home</a></li>
+          <li><a href="rekomendasi.html" class="hover:text-green-600 font-medium">Makanan</a></li>
+          <li><a href="about us.html" class="hover:text-green-600 font-medium">Tentang</a></li>
+          <li><a href="contact.html" class="hover:text-green-600 font-medium">Kontak</a></li>
+          <li v-if="isLoggedIn"><a href="profile.html" class="hover:text-green-600 font-medium">Profile</a></li>
+          <li v-if="isLoggedIn"><button @click="logout" class="hover:text-green-600 font-medium">Logout</button></li>
+          <li v-else><a href="login.html" class="hover:text-green-600 font-medium">Login</a></li>
+        </ul>
       </div>
 
-      <div>
-        <label class="block font-semibold text-gray-700">Tinggi Badan ({{ unitLabel.height }}):</label>
-        <input type="number" v-model="height" required min="1"
-          class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400" />
+      <transition name="fade-slide">
+        <ul v-show="showMenu" class="md:hidden px-4 pb-4 space-y-2">
+          <li><a href="index.html" class="block py-2 text-green-600">Home</a></li>
+          <li><a href="rekomendasi.html" class="block py-2 text-green-600">Makanan</a></li>
+          <li><a href="about us.html" class="block py-2 text-green-600">Tentang</a></li>
+          <li><a href="contact.html" class="block py-2 text-green-600">Kontak</a></li>
+          <li v-if="isLoggedIn"><a href="profile.html" class="block py-2 text-green-600">Profile</a></li>
+          <li v-if="isLoggedIn"><button @click="logout" class="block py-2 text-green-600">Logout</button></li>
+          <li v-else><a href="login.html" class="block py-2 text-green-600">Login</a></li>
+        </ul>
+      </transition>
+    </nav>
+
+    <!-- BMI Calculator -->
+    <div class="flex items-center justify-center px-4 py-16">
+      <div class="max-w-lg w-full bg-white p-8 rounded-2xl shadow-2xl card-3d transition-all duration-500">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">BMI Calculator</h1>
+
+        <form @submit.prevent="calculateBMI" class="space-y-4">
+          <div>
+            <label class="block font-semibold text-gray-700">Berat Badan ({{ unitLabel.weight }}):</label>
+            <input type="number" v-model="weight" required min="1"
+                   class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400" />
+          </div>
+
+          <div>
+            <label class="block font-semibold text-gray-700">Tinggi Badan ({{ unitLabel.height }}):</label>
+            <input type="number" v-model="height" required min="1"
+                   class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400" />
+          </div>
+
+          <div>
+            <label class="block font-semibold text-gray-700">Satuan:</label>
+            <select v-model="unit"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+              <option value="metric">Metric (kg, cm)</option>
+              <option value="imperial">Imperial (lb, ft)</option>
+            </select>
+          </div>
+
+          <button type="submit"
+                  class="w-full mb-6 bg-gradient-to-r from-green-400 to-green-600 text-white font-bold py-3 rounded-lg shadow-md transform hover:scale-105 transition duration-300">
+            Hitung BMI
+          </button>
+        </form>
+
+        <div v-if="result" class="mt-6 space-y-4">
+          <h2 class="text-xl font-semibold">Hasil:</h2>
+          <p><strong>BMI:</strong> {{ result.bmi.toFixed(2) }}</p>
+          <p><strong>Status:</strong> {{ result.status }}</p>
+          <p><strong>Saran:</strong> {{ result.suggestion }}</p>
+          <p class="text-sm text-gray-600">Unit: {{ unit }}</p>
+
+          <div class="relative mt-6">
+            <div class="flex h-5 rounded-full overflow-hidden shadow-md">
+              <div class="flex-1 bg-blue-300" title="Underweight"></div>
+              <div class="flex-1 bg-green-400" title="Normal"></div>
+              <div class="flex-1 bg-yellow-400" title="Overweight"></div>
+              <div class="flex-1 bg-red-400" title="Obese"></div>
+            </div>
+
+            <div class="relative">
+              <div class="absolute top-1.5 transform -translate-x-1/2" :style="{ left: bmiIndicatorPosition + '%' }">
+                <div class="text-red-600 text-xl animate-bounce">▲</div>
+              </div>
+            </div>
+
+            <div class="flex justify-between text-sm mt-2 px-1 text-gray-600">
+              <span>&lt;18.5</span>
+              <span>18.5–24.9</span>
+              <span>25–29.9</span>
+              <span>30+</span>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="error" class="mt-4 text-red-600 text-center font-medium">
+          ⚠️ {{ error }}
+        </div>
       </div>
-
-      <div>
-        <label class="block font-semibold text-gray-700">Satuan:</label>
-        <select v-model="unit"
-          class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
-          <option value="metric">Metric (kg, cm)</option>
-          <option value="imperial">Imperial (lb, ft)</option>
-        </select>
-      </div>
-
-      <button type="submit"
-        class="w-full mb-6 bg-gradient-to-r from-green-400 to-green-600 text-white font-bold py-3 rounded-lg shadow-md transform hover:scale-105 transition duration-300">
-        Hitung BMI
-      </button>
-    </form>
-
-<div v-if="result" class="mt-6 space-y-4">
-  <h2 class="text-xl font-semibold">Hasil:</h2>
-  <p><strong>BMI:</strong> {{ result.bmi.toFixed(2) }}</p>
-  <p><strong>Status:</strong> {{ result.status }}</p>
-  <p><strong>Saran:</strong> {{ result.suggestion }}</p>
-  <p class="text-sm text-gray-600">Unit: {{ unit }}</p>
-
-  <!-- Linear BMI Bar -->
-  <div class="relative mt-6">
-    <!-- Background bar -->
-    <div class="flex h-5 rounded-full overflow-hidden shadow-md">
-      <div class="flex-1 bg-blue-300" title="Underweight"></div>
-      <div class="flex-1 bg-green-400" title="Normal"></div>
-      <div class="flex-1 bg-yellow-400" title="Overweight"></div>
-      <div class="flex-1 bg-red-400" title="Obese"></div>
-    </div>
-
-    <!-- Indicator -->
-    <div class="relative">
-      <div
-        class="absolute top-1.5 transform -translate-x-1/2"
-        :style="{ left: bmiIndicatorPosition + '%' }"
-      >
-        <div class="text-red-600 text-xl animate-bounce">▲</div>
-      </div>
-    </div>
-
-    <!-- Labels -->
-    <div class="flex justify-between text-sm mt-2 px-1 text-gray-600">
-      <span>&lt;18.5</span>
-      <span>18.5–24.9</span>
-      <span>25–29.9</span>
-      <span>30+</span>
     </div>
   </div>
-</div>
 
-
-    <div v-if="error" class="mt-4 text-red-600 text-center font-medium">
-      ⚠️ {{ error }}
-    </div>
-  </div>
-
-  <script>
-    const { createApp, computed, watch } = Vue;
-
+   <script>
+    const { createApp, computed } = Vue;
     createApp({
       data() {
         return {
+          showMenu: false,
+          user: null,
+          isLoggedIn: false,
+          token: null,
           weight: '',
           height: '',
           unit: 'metric',
@@ -106,48 +142,86 @@
         };
       },
       computed: {
-         unitLabel() {
-    return this.unit === 'metric'
-      ? { weight: 'kg', height: 'cm' }
-      : { weight: 'lb', height: 'ft' };
-  },
-  bmiIndicatorPosition() {
-    if (!this.result || !this.result.bmi) return 0;
-    const bmi = this.result.bmi;
-
-    // Rentang BMI dari 10 (min) ke 40 (max) untuk skala
-    const min = 10;
-    const max = 40;
-    const clamped = Math.max(min, Math.min(max, bmi));
-    return ((clamped - min) / (max - min)) * 100;
-  }
-},
+        unitLabel() {
+          return this.unit === 'metric'
+            ? { weight: 'kg', height: 'cm' }
+            : { weight: 'lb', height: 'ft' };
+        },
+        bmiIndicatorPosition() {
+          if (!this.result || !this.result.bmi) return 0;
+          const bmi = this.result.bmi;
+          const min = 10;
+          const max = 40;
+          const clamped = Math.max(min, Math.min(max, bmi));
+          return ((clamped - min) / (max - min)) * 100;
+        }
+      },
+      mounted() {
+        this.checkLoginSession();
+      },
       methods: {
-        async calculateBMI() {
-          this.result = null;
-          this.error = '';
-          if (!this.weight || !this.height) {
-            this.error = "Isi berat dan tinggi terlebih dahulu.";
-            return;
-          }
+        checkLoginSession() {
+        const savedToken = localStorage.getItem("authToken");
+        if (savedToken) {
+          this.isLoggedIn = true;
+          this.token = savedToken;
+        } else {
+          this.isLoggedIn = false;
+        }
+      },
+        logout() {
+        localStorage.removeItem("authToken");
+        this.isLoggedIn = false;
+        this.user = null;
+        this.token = null;
+        window.location.href = "login.html";
+      },
+       async calculateBMI() {
+        this.result = null;
+        this.error = '';
 
-          try {
-            const response = await fetch(`http://localhost:8000/api/bmi?weight=${this.weight}&height=${this.height}&unit=${this.unit}`);
-            if (!response.ok) throw new Error(await response.text());
-            const data = await response.json();
-            this.result = data;
+        if (!this.weight || !this.height) {
+          this.error = "Isi berat dan tinggi terlebih dahulu.";
+          return;
+        }
 
-            this.$nextTick(() => this.renderChart(data.bmi));
-          } catch (err) {
-            this.error = err.message || "Gagal menghitung BMI";
-          }
+        if (!this.token) {
+          this.error = "Anda belum login!";
+          return;
+        }
+
+  try {
+    const response = await fetch("http://localhost:8000/api/bmi", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${this.token}` // kirim token ke backend
+      },
+      body: JSON.stringify({
+        weight: this.weight,
+        height: this.height,
+        unit: this.unit
+      })
+    });
+
+    if (!response.ok) throw new Error(await response.text());
+    const data = await response.json();
+    this.result = {
+      bmi: data.nilai_bmi,
+      status: data.kategori,
+      suggestion: data.saran
+    };
+
+    this.$nextTick(() => this.renderChart(data.nilai_bmi));
+  } catch (err) {
+    this.error = err.message || "Gagal menghitung BMI";
+  }
         },
         renderChart(bmiValue) {
           const maxBMI = 40;
-          if (this.chart) {
-            this.chart.destroy();
-          }
-          const ctx = document.getElementById('bmiChart').getContext('2d');
+          if (this.chart) this.chart.destroy();
+          const ctx = document.getElementById('bmiChart')?.getContext('2d');
+          if (!ctx) return;
           this.chart = new Chart(ctx, {
             type: 'doughnut',
             data: {
@@ -172,4 +246,6 @@
     }).mount('#app');
   </script>
 </body>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="/static/js/index.js"></script>
 </html>
