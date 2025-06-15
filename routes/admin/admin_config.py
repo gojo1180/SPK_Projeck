@@ -11,7 +11,7 @@ router = APIRouter(
     dependencies=[Depends(get_current_admin)]
 )
 
-CONFIG_FILE_PATH = Path(__file__).parent.parent.parent / "config" / "default_weights.json"
+CONFIG_FILE_PATH = Path(__file__).parent.parent.parent / "config" / "default_weight.json"
 
 # TAMBAHKAN path lengkap
 @router.get("/admin/bobot-default/", response_model=config_schemas.DefaultWeightsSchema)

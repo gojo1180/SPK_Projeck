@@ -133,13 +133,23 @@
     </p>
 
     <!-- Tombol Edit -->
-    <button
-      class="mt-4 w-full bg-[#0d4732] text-white text-sm font-semibold py-2 rounded-xl shadow-md hover:bg-[#0f5a3f] active:scale-95 transition-transform duration-300"
-      @click.stop="openEditModal(makanan)"
-    >
-      ✏ Edit
-    </button>
-  </div>
+   <div class="mt-4 flex items-center space-x-2">
+  
+  <button
+    class="flex-1 bg-[#0d4732] text-white text-sm font-semibold py-2 rounded-xl shadow-md hover:bg-[#0f5a3f] active:scale-95 transition-transform duration-300"
+    @click.stop="openEditModal(makanan)"
+  >
+    ✏️ Edit
+  </button>
+
+  <button
+    class="flex-1 bg-red-600 text-white text-sm font-semibold py-2 rounded-xl shadow-md hover:bg-red-700 active:scale-95 transition-transform duration-300"
+    @click.stop="confirmForceDelete(makanan)"
+  >
+    🗑️ Hapus
+  </button>
+
+</div>
 </div>
 
 
@@ -179,23 +189,24 @@
                   ></textarea>
                 </div>
 
-                <div class="mb-3">
-                  <label class="block text-sm font-medium"
-                    >Gambar Baru (opsional)</label
-                  >
-                  <input
-                    @change="handleEditFileUpload"
-                    type="file"
-                    accept="image/*"
-                    class="w-full"
-                  />
-                </div>
+<div class="mb-3">
+                  </div>
 
+                <hr class="my-4">
+                <h4 class="text-md font-semibold mb-2">Nilai Gizi</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div v-for="(kriteria, index) in daftarKriteria" :key="kriteria.id_kriteria">
+                        <label class="block text-sm font-medium">{{ kriteria.nama_kriteria }}</label>
+                        <input
+                            v-model.number="editForm.nilaiGizi[index]"
+                            type="number"
+                            step="any"
+                            class="w-full border px-3 py-2 rounded"
+                        />
+                    </div>
+                </div>
                 <div class="mt-4 text-right">
-                  <button
-                    type="submit"
-                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                  >
+                  <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                     Simpan Perubahan
                   </button>
                 </div>
@@ -243,14 +254,23 @@
                 </div>
 
                 <!-- Gambar -->
-                <div class="mb-3">
+            <div class="mb-3">
                   <label class="block text-sm font-medium">Gambar</label>
-                  <input
-                    @change="handleFileUpload"
-                    type="file"
-                    accept="image/*"
-                    class="w-full"
-                  />
+                  <input @change="handleFileUpload" type="file" accept="image/*" class="w-full" required/>
+                </div>
+                
+                <hr class="my-4">
+                <h4 class="text-md font-semibold mb-2">Nilai Gizi</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div v-for="(kriteria, index) in daftarKriteria" :key="kriteria.id_kriteria">
+                        <label class="block text-sm font-medium">{{ kriteria.nama_kriteria }}</label>
+                        <input
+                            v-model.number="form.nilaiGizi[index]"
+                            type="number"
+                            step="any"
+                            class="w-full border px-3 py-2 rounded"
+                        />
+                    </div>
                 </div>
                 <!-- Submit -->
                 <div class="mt-4 text-right">
@@ -316,19 +336,21 @@
     expandedCardId: null,
     selectedCard: null,
     showEditModal: false,
-    form: {
-      nama: "",
-      deskripsi: "",
-      gambar: null,
-    },
-    editForm: {
-      id_makanan: null,
-      nama: "",
-      deskripsi: "",
-      gambar: null,
-    },
+          form: {
+          nama: "",
+          deskripsi: "",
+          gambar: null,
+          nilaiGizi: [] // <-- TAMBAHKAN: untuk form tambah
+        },
+        editForm: {
+          id_makanan: null,
+          nama: "",
+          deskripsi: "",
+          gambar: null,
+          nilaiGizi: [] // <-- TAMBAHKAN: untuk form edit
+        },
     daftarMakanan: [],
-
+    daftarKriteria: [],   
     // Tambahan untuk konfigurasi bobot
     bobotKonfigurasi: null,
     isLoadingBobot: false,
@@ -340,7 +362,8 @@
   if (!token) {
     window.location.href = "/loginadmin.html";
   } else {
-    this.loadMakanan();
+            this.loadMakanan();
+        this.loadKriteria();
   }
 },
 watch: {
@@ -351,6 +374,23 @@ watch: {
   }
 },
     methods: {
+
+            async loadKriteria() {
+        try {
+          const token = localStorage.getItem("admin_token");
+          const response = await fetch("http://localhost:8000/admin/kriteria/", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (!response.ok) throw new Error("Gagal memuat kriteria");
+          const data = await response.json();
+          this.daftarKriteria = data;
+        } catch (error) {
+           Toastify({ text: "Error: " + error.message, backgroundColor: "#f44336" }).showToast();
+        }
+      },
+
       async loadConfig() {
   try {
     const token = localStorage.getItem("admin_token");
@@ -389,6 +429,7 @@ watch: {
       handleEditFileUpload(event) {
         this.editForm.gambar = event.target.files[0];
       },
+      // MODIFIKASI method submitMakanan
       async submitMakanan() {
         const formData = new FormData();
         formData.append("nama", this.form.nama);
@@ -396,10 +437,19 @@ watch: {
         if (this.form.gambar) {
           formData.append("gambar", this.form.gambar);
         }
+        
+        // TAMBAHKAN LOGIKA INI
+        // Ubah array nilai gizi menjadi string JSON untuk dikirim
+        const nilaiGiziPayload = this.form.nilaiGizi.map((g, index) => ({
+            id_kriteria: this.daftarKriteria[index].id_kriteria,
+            nilai: g
+        })).filter(g => g.nilai !== null && g.nilai !== ''); // Filter yang tidak diisi
+        formData.append("nilai_gizi", JSON.stringify(nilaiGiziPayload));
+
 
         try {
           const token = localStorage.getItem("admin_token");
-
+          // ... (sisa kode fetch tidak berubah)
           const response = await fetch("http://localhost:8000/admin/makanan/", {
             method: "POST",
             headers: {
@@ -437,14 +487,18 @@ watch: {
           }).showToast();
         }
       },
-      openEditModal(makanan) {
-        this.editForm = {
-          id_makanan: makanan.id_makanan,
-          nama: makanan.nama,
-          deskripsi: makanan.deskripsi,
-          gambar: null,
-        };
-        this.showEditModal = true;
+     openEditModal(makanan) {
+          this.editForm = {
+              id_makanan: makanan.id_makanan,
+              nama: makanan.nama,
+              deskripsi: makanan.deskripsi,
+              gambar: null,
+              // Reset nilai gizi, akan diisi dari backend
+              nilaiGizi: Array(this.daftarKriteria.length).fill(null) 
+          };
+          this.showEditModal = true;
+          // Di sini Anda bisa menambahkan fetch untuk mendapatkan nilai gizi yang sudah ada
+          // (Untuk sekarang kita biarkan kosong agar tidak terlalu kompleks)
       },
       async submitEditMakanan() {
         const formData = new FormData();
@@ -453,7 +507,14 @@ watch: {
         if (this.editForm.gambar) {
           formData.append("gambar", this.editForm.gambar);
         }
-
+        
+        // TAMBAHKAN LOGIKA INI
+        const nilaiGiziPayload = this.editForm.nilaiGizi.map((g, index) => ({
+            id_kriteria: this.daftarKriteria[index].id_kriteria,
+            nilai: g
+        })).filter(g => g.nilai !== null && g.nilai !== '');
+        formData.append("nilai_gizi", JSON.stringify(nilaiGiziPayload));
+        
         try {
           const token = localStorage.getItem("admin_token");
 
@@ -547,6 +608,49 @@ watch: {
     this.isLoadingBobot = false;
   }
 },
+
+confirmForceDelete(makanan) {
+        // Tampilkan dialog konfirmasi dari browser
+        const isConfirmed = confirm(
+          `Anda yakin ingin menghapus '${makanan.nama}' secara permanen?\n\nPERINGATAN: Tindakan ini juga akan menghapus semua data rekomendasi terkait makanan ini dan tidak dapat dibatalkan.`
+        );
+
+        // Jika pengguna menekan "OK", lanjutkan proses penghapusan
+        if (isConfirmed) {
+          this.forceDeleteMakanan(makanan.id_makanan);
+        }
+      },
+
+      /**
+       * Mengirim permintaan DELETE ke API untuk menghapus makanan.
+       */
+      async forceDeleteMakanan(makananId) {
+        try {
+          const token = localStorage.getItem("admin_token");
+          const response = await fetch(`http://localhost:8000/admin/makanan/${makananId}/force`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Gagal menghapus makanan.');
+          }
+
+          // Tampilkan notifikasi sukses
+          Toastify({ text: "Makanan berhasil dihapus.", backgroundColor: "#4caf50" }).showToast();
+
+          // Muat ulang daftar makanan untuk memperbarui tampilan tabel
+          this.loadMakanan();
+
+        } catch (error) {
+          // Tampilkan notifikasi error
+          Toastify({ text: "Error: " + error.message, backgroundColor: "#f44336" }).showToast();
+        }
+      },
+
 async simpanBobotKonfigurasi() {
   try {
     const token = localStorage.getItem("admin_token");
@@ -573,6 +677,7 @@ async simpanBobotKonfigurasi() {
     }).showToast();
   }
 },
+
     },
   }).mount("#app");
 </script>
