@@ -43,8 +43,8 @@
         <!-- Menu desktop -->
         <ul class="hidden md:flex gap-6 items-center">
           <li><a href="index.html" class="hover:text-green-600 font-medium">Home</a></li>
-          <li><a href="#" class="hover:text-green-600 font-medium">Makanan</a></li>
-          <li><a href="#" class="hover:text-green-600 font-medium">Tentang</a></li>
+          <li><a href="rekomendasi.html" class="hover:text-green-600 font-medium">Makanan</a></li>
+          <li><a href="about us.html" class="hover:text-green-600 font-medium">Tentang</a></li>
           <li><a href="#" class="hover:text-green-600 font-medium">Kontak</a></li>
           <li v-if="isLoggedIn"><a href="profile.html" class="hover:text-green-600 font-medium">Profile</a></li>
           <li v-if="isLoggedIn"><button @click="logout" class="hover:text-green-600 font-medium">Logout</button></li>
@@ -56,8 +56,8 @@
       <transition name="fade-slide">
         <ul v-show="showMenu" class="md:hidden px-4 pb-4 space-y-2">
           <li><a href="index.html" class="block py-2 text-green-600">Home</a></li>
-          <li><a href="#" class="block py-2 text-green-600">Makanan</a></li>
-          <li><a href="#" class="block py-2 text-green-600">Tentang</a></li>
+          <li><a href="rekomendasi.html" class="block py-2 text-green-600">Makanan</a></li>
+          <li><a href="about us.html" class="block py-2 text-green-600">Tentang</a></li>
           <li><a href="#" class="block py-2 text-green-600">Kontak</a></li>
           <li v-if="isLoggedIn"><a href="profile.html" class="block py-2 text-green-600">Profile</a></li>
           <li v-if="isLoggedIn"><button @click="logout" class="block py-2 text-green-600">Logout</button></li>

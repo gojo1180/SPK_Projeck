@@ -47,20 +47,16 @@
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
-<!-- Navbar -->
-  <div id="app">
-    <!-- Navbar -->
+<div id="app">
     <nav class="bg-white shadow-md sticky top-0 z-50">
       <div class="container mx-auto px-4 py-4 flex items-center justify-between">
         <h1 class="text-2xl font-bold text-green-600">HealthyGym</h1>
-        <!-- Dropdown toggle -->
         <button @click="showMenu = !showMenu" class="md:hidden focus:outline-none">
           <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
 
-        <!-- Menu desktop -->
         <ul class="hidden md:flex gap-6 items-center">
           <li><a href="index.html" class="hover:text-green-600 font-medium">Home</a></li>
           <li><a href="rekomendasi.html" class="hover:text-green-600 font-medium">Makanan</a></li>
@@ -72,7 +68,6 @@
         </ul>
       </div>
 
-      <!-- Dropdown menu mobile -->
       <transition name="fade-slide">
         <ul v-show="showMenu" class="md:hidden px-4 pb-4 space-y-2">
           <li><a href="index.html" class="block py-2 text-green-600">Home</a></li>
@@ -86,7 +81,6 @@
       </transition>
     </nav>
 
-  <!-- Hero Carousel Fullscreen -->
   <section id="hero-carousel">
     <div class="hero-overlay"></div>
     <div class="hero-content px-4">
@@ -101,7 +95,6 @@
     <h2 class="text-3xl font-bold">Our Healthy Menu</h2>
   </div>
   <div class="flex flex-wrap justify-center gap-8 px-6">
-    <!-- Card -->
     <div class="relative rounded-2xl w-64 h-[400px] overflow-hidden group transition duration-300 hover:scale-105 shadow-lg hover:shadow-[0_10px_30px_-5px_rgba(34,197,94,0.7)] bg-white hover:bg-green-600">
       <div class="flex justify-center mt-6 transition duration-300 group-hover:scale-110">
         <img src="https://www.tasteofhome.com/wp-content/uploads/2018/01/Simple-Italian-Salad_EXPS_FT20_25957_F_0624_1-1.jpg" alt="Salad"
@@ -114,7 +107,6 @@
       </div>
     </div>
 
-    <!-- Duplikat untuk card lainnya -->
     <div class="relative rounded-2xl w-64 h-[400px] overflow-hidden group transition duration-300 hover:scale-105 shadow-lg hover:shadow-[0_10px_30px_-5px_rgba(34,197,94,0.7)] bg-white hover:bg-green-600">
       <div class="flex justify-center mt-6 transition duration-300 group-hover:scale-110">
         <img src="https://inquiringchef.com/wp-content/uploads/2022/03/Thai-Cashew-Chicken_square-5166.jpg" alt="Salad"
@@ -127,7 +119,7 @@
       </div>
     </div>
 
-       <div class="relative rounded-2xl w-64 h-[400px] overflow-hidden group transition duration-300 hover:scale-105 shadow-lg hover:shadow-[0_10px_30px_-5px_rgba(34,197,94,0.7)] bg-white hover:bg-green-600">
+      <div class="relative rounded-2xl w-64 h-[400px] overflow-hidden group transition duration-300 hover:scale-105 shadow-lg hover:shadow-[0_10px_30px_-5px_rgba(34,197,94,0.7)] bg-white hover:bg-green-600">
       <div class="flex justify-center mt-6 transition duration-300 group-hover:scale-110">
         <img src="https://i2.wp.com/www.downshiftology.com/wp-content/uploads/2014/08/Salmon-Avocado-Salad-5.jpg" alt="Salad"
           class="w-40 h-40 rounded-full object-cover ring-4 ring-white shadow-md">
@@ -199,9 +191,6 @@
     </div>
   </div>
 </section>
-
-
-
 <section class="py-16 bg-gray-50">
   <div class="text-center mb-12">
     <h2 class="text-3xl font-bold">WHY CHOOSE US?</h2>
@@ -211,11 +200,9 @@
   </div>
 
   <div class="flex flex-wrap justify-center gap-10 px-6">
-    <!-- Card 1 -->
     <div class="relative w-72 h-[420px] bg-white rounded-2xl shadow-md p-6 text-center group transition duration-300 hover:scale-105 hover:bg-green-600 hover:shadow-[0_10px_30px_-5px_rgba(34,197,94,0.7)]">
       <div class="text-green-600 text-6xl mb-6 transition duration-300 group-hover:text-white">
-        🥦 <!-- Ganti dengan ikon SVG jika perlu -->
-      </div>
+        🥦 </div>
       <h3 class="text-xl font-semibold text-gray-800 group-hover:text-white transition duration-300">
         Personalized Nutrition
       </h3>
@@ -224,7 +211,6 @@
       </p>
     </div>
 
-    <!-- Card 2 -->
     <div class="relative w-72 h-[420px] bg-white rounded-2xl shadow-md p-6 text-center group transition duration-300 hover:scale-105 hover:bg-green-600 hover:shadow-[0_10px_30px_-5px_rgba(34,197,94,0.7)]">
       <div class="text-green-600 text-6xl mb-6 transition duration-300 group-hover:text-white">
         📊
@@ -237,7 +223,6 @@
       </p>
     </div>
 
-    <!-- Card 3 -->
     <div class="relative w-72 h-[420px] bg-white rounded-2xl shadow-md p-6 text-center group transition duration-300 hover:scale-105 hover:bg-green-600 hover:shadow-[0_10px_30px_-5px_rgba(34,197,94,0.7)]">
       <div class="text-green-600 text-6xl mb-6 transition duration-300 group-hover:text-white">
         ⚡
@@ -261,16 +246,13 @@
     </p>
   </div>
 
-  <!-- Tabs -->
   <div class="flex justify-center space-x-4 mb-8">
     <button onclick="showTab('bulking')" class="tab-button bg-green-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-green-700 transition">Bulking</button>
     <button onclick="showTab('cutting')" class="tab-button bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-gray-300 transition">Cutting</button>
     <button onclick="showTab('maintenance')" class="tab-button bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-gray-300 transition">Maintenance</button>
   </div>
 
-  <!-- Cards Container -->
   <div id="foodsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 max-w-6xl mx-auto">
-    <!-- Card contoh -->
     <div data-tab="bulking" class="card group bg-white rounded-2xl shadow-md overflow-hidden transition hover:bg-green-600 hover:scale-105 cursor-pointer">
       <img src="https://assets.promediateknologi.id/crop/0x0:0x0/750x500/webp/photo/2022/03/26/953544907.jpeg" alt="Dada Ayam" class="w-full h-48 object-cover transition duration-300">
       <div class="p-4 text-center">
@@ -279,8 +261,7 @@
       </div>
     </div>
 
-      <!-- Cards Bulking -->
-        <div data-tab="bulking" class="card group bg-white rounded-2xl shadow-md overflow-hidden transition hover:bg-green-600 hover:scale-105 cursor-pointer">
+      <div data-tab="bulking" class="card group bg-white rounded-2xl shadow-md overflow-hidden transition hover:bg-green-600 hover:scale-105 cursor-pointer">
       <img src="https://st4.depositphotos.com/2491621/40103/i/1600/depositphotos_401036096-stock-photo-roast-beef-sandwich-lettuce-tomato.jpg" alt="Sandwich Daging Sapi" class="w-full h-48 object-cover transition duration-300">
       <div class="p-4 text-center">
         <h3 class="text-xl font-bold text-gray-800 group-hover:text-white">Sandwich Daging Sapi </h3>
@@ -295,10 +276,7 @@
         <p class="text-gray-600 text-sm mt-2 group-hover:text-white">Sumber protein dan karbohidrat kompleks, cocok untuk fase bulking.</p>
       </div>
     </div>
-      <!-- Cards Bulking -->
-
-    <!-- Cards Cutting -->
-    <div data-tab="cutting" class="card hidden group bg-white rounded-2xl shadow-md overflow-hidden transition hover:bg-green-600 hover:scale-105 cursor-pointer">
+      <div data-tab="cutting" class="card hidden group bg-white rounded-2xl shadow-md overflow-hidden transition hover:bg-green-600 hover:scale-105 cursor-pointer">
       <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1" alt="Salad" class="w-full h-48 object-cover transition duration-300">
       <div class="p-4 text-center">
         <h3 class="text-xl font-bold text-gray-800 group-hover:text-white">Ayam Panggang </h3>
@@ -321,9 +299,6 @@
         <p class="text-gray-600 text-sm mt-2 group-hover:text-white">Makanan rendah kalori, kaya serat, ideal untuk cutting.</p>
       </div>
     </div>
-    <!-- Cards Cutting -->
-
-    <!-- Cards Maintenance -->
     <div data-tab="maintenance" class="card hidden group bg-white rounded-2xl shadow-md overflow-hidden transition hover:bg-green-600 hover:scale-105 cursor-pointer">
       <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c" alt="Oatmeal" class="w-full h-48 object-cover transition duration-300">
       <div class="p-4 text-center">
@@ -393,7 +368,6 @@
   </div>
 
   <div class="flex flex-wrap justify-center gap-8 px-6">
-    <!-- CARD 1 -->
     <div 
       class="group stat-card w-64 h-44 bg-green-50 rounded-2xl shadow-md flex flex-col justify-center items-center transition duration-300 transform hover:scale-105 hover:bg-green-600 cursor-pointer"
       data-aos="fade-up"
@@ -404,7 +378,6 @@
       <p class="mt-2 text-gray-600 transition duration-300 group-hover:text-white">Pengguna Aktif</p>
     </div>
 
-    <!-- CARD 2 -->
     <div 
       class="group stat-card w-64 h-44 bg-green-50 rounded-2xl shadow-md flex flex-col justify-center items-center transition duration-300 transform hover:scale-105 hover:bg-green-600 cursor-pointer"
       data-aos="fade-up"
@@ -415,7 +388,6 @@
       <p class="mt-2 text-gray-600 transition duration-300 group-hover:text-white">Rekomendasi Makanan</p>
     </div>
 
-    <!-- CARD 3 -->
     <div 
       class="group stat-card w-64 h-44 bg-green-50 rounded-2xl shadow-md flex flex-col justify-center items-center transition duration-300 transform hover:scale-105 hover:bg-green-600 cursor-pointer"
       data-aos="fade-up"
@@ -429,11 +401,9 @@
   </div>
 </section>
 
-<!-- Footer -->
 <footer class="bg-white text-gray-800 py-10 shadow-md border-t border-gray-200">
   <div class="container mx-auto px-6 max-w-7xl">
     <div class="flex flex-col sm:flex-row justify-between gap-10">
-      <!-- Logo & Description -->
       <div class="sm:w-1/3">
         <h2 class="text-2xl font-extrabold mb-3 tracking-wide select-none text-gray-900">HealthyGym</h2>
         <p class="text-gray-600 text-sm leading-relaxed">
@@ -441,7 +411,6 @@
         </p>
       </div>
 
-      <!-- Kontak -->
       <div class="sm:w-1/3 space-y-3">
         <h3 class="font-semibold text-lg mb-2 uppercase tracking-wide text-gray-900">Kontak</h3>
         <p class="hover:text-green-600 transition-transform transform hover:-translate-y-1 hover:scale-105 cursor-pointer text-gray-700">
@@ -452,11 +421,9 @@
         </p>
       </div>
 
-      <!-- Sosial Media -->
       <div class="sm:w-1/3">
         <h3 class="font-semibold text-lg mb-4 uppercase tracking-wide text-gray-900">Sosial Media</h3>
         <div class="flex space-x-6 justify-center sm:justify-start">
-          <!-- Facebook -->
           <a href="#" aria-label="Facebook" 
              class="text-gray-600 hover:text-green-600 transition-transform transform hover:rotate-6 hover:scale-110" 
              style="perspective: 500px;">
@@ -465,7 +432,6 @@
             </svg>
           </a>
 
-          <!-- Twitter -->
           <a href="#" aria-label="Twitter"
              class="text-gray-600 hover:text-green-600 transition-transform transform hover:-rotate-6 hover:scale-110" 
              style="perspective: 500px;">
@@ -474,7 +440,6 @@
             </svg>
           </a>
 
-          <!-- Instagram -->
           <a href="#" aria-label="Instagram"
              class="text-gray-600 hover:text-green-600 transition-transform transform hover:rotate-6 hover:scale-110" 
              style="perspective: 500px;">
@@ -537,6 +502,16 @@
             }
           });
           const data = await response.json();
+          
+          // === PERBAIKAN DIMULAI DI SINI ===
+          // Loop melalui setiap grup dalam data dan urutkan item di dalamnya berdasarkan ranking
+          for (const key in data) {
+            if (data.hasOwnProperty(key) && Array.isArray(data[key])) {
+              data[key].sort((a, b) => a.ranking - b.ranking);
+            }
+          }
+          // === PERBAIKAN SELESAI ===
+
           this.historiGrouped = data;
 
           // Inisialisasi semua grup tertutup saat pertama kali dimuat
@@ -561,15 +536,19 @@
         });
       },
      formatGroupKey(key) {
-    const [timestamp, fase, waktu] = key.split("__");
-    const waktuFormatted = new Date(timestamp).toLocaleString("id-ID", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    });
-    return `${waktuFormatted} • Fase: ${fase.charAt(0).toUpperCase() + fase.slice(1)} • Waktu: ${waktu.replace("_", " ")}`;
+       const [timestamp, fase, waktu] = key.split("__");
+       const waktuFormatted = new Date(timestamp).toLocaleString("id-ID", {
+         day: "numeric",
+         month: "short",
+         year: "numeric",
+         hour: "2-digit",
+         minute: "2-digit"
+       });
+       // Mengganti underscore dengan spasi dan membuat huruf kapital
+       const formattedWaktu = waktu.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase());
+       const formattedFase = fase.charAt(0).toUpperCase() + fase.slice(1);
+
+       return `${waktuFormatted} • Fase: ${formattedFase} • Waktu: ${formattedWaktu}`;
       }
     }
   }).mount("#app");

@@ -15,27 +15,20 @@
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   
   <style>
-    /* Gaya kustom Anda dipertahankan */
     .card:hover {
       transform: perspective(1000px) rotateX(2deg) rotateY(2deg) scale(1.03);
       transition: all 0.4s ease;
       box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
     }
-
     .glass {
       background: rgba(255, 255, 255, 0.6);
       backdrop-filter: blur(12px);
       box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     }
-    
-    /* Transisi untuk Vue */
-    .fade-enter-active,
-    .fade-leave-active {
+    .fade-enter-active, .fade-leave-active {
       transition: opacity 0.4s ease-out;
     }
-
-    .fade-enter-from,
-    .fade-leave-to {
+    .fade-enter-from, .fade-leave-to {
       opacity: 0;
     }
   </style>
@@ -63,7 +56,14 @@
       </div>
       <transition name="fade">
         <ul v-show="showMenu" class="md:hidden px-4 pb-4 space-y-2">
-          </ul>
+            <li><a href="index.html" class="block py-2 hover:text-green-600 font-medium">Home</a></li>
+            <li><a href="rekomendasi.html" class="block py-2 hover:text-green-600 font-medium">Makanan</a></li>
+            <li><a href="about us.html" class="block py-2 hover:text-green-600 font-medium">Tentang</a></li>
+            <li><a href="contact.html" class="block py-2 hover:text-green-600 font-medium">Kontak</a></li>
+            <li v-if="isLoggedIn"><a href="profile.html" class="block py-2 hover:text-green-600 font-medium">Profile</a></li>
+            <li v-if="isLoggedIn"><button @click="logout" class="block py-2 w-full text-left hover:text-green-600 font-medium">Logout</button></li>
+            <li v-else><a href="login.html" class="block py-2 hover:text-green-600 font-medium">Login</a></li>
+        </ul>
       </transition>
     </nav>
 
@@ -80,13 +80,13 @@
 
       <transition name="fade" mode="out-in">
         <div v-if="!selectionMode" class="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto" data-aos="fade-in">
-          <div @click="selectionMode = 'preset'" class="cursor-pointer text-center bg-white p-8 rounded-2xl shadow-lg border-2 border-transparent hover:border-green-500 transition-all duration-300 transform hover:-translate-y-1">
+          <div @click="selectMode('preset')" class="cursor-pointer text-center bg-white p-8 rounded-2xl shadow-lg border-2 border-transparent hover:border-green-500 transition-all duration-300 transform hover:-translate-y-1">
             <h2 class="text-2xl font-bold text-gray-800 mb-3">Gunakan Preset</h2>
-            <p class="text-gray-600">Pilihan cepat berdasarkan fase latihan Anda. Kami yang akan menentukan bobot terbaik.</p>
+            <p class="text-gray-600">Pilihan cepat berdasarkan fase latihan Anda.</p>
           </div>
-          <div @click="selectionMode = 'customize'" class="cursor-pointer text-center bg-white p-8 rounded-2xl shadow-lg border-2 border-transparent hover:border-green-500 transition-all duration-300 transform hover:-translate-y-1">
+          <div @click="selectMode('customize')" class="cursor-pointer text-center bg-white p-8 rounded-2xl shadow-lg border-2 border-transparent hover:border-green-500 transition-all duration-300 transform hover:-translate-y-1">
             <h2 class="text-2xl font-bold text-gray-800 mb-3">Atur Kustom</h2>
-            <p class="text-gray-600">Dapatkan hasil personal dengan mengatur prioritas bobot sesuai preferensi Anda.</p>
+            <p class="text-gray-600">Atur prioritas bobot sesuai preferensi Anda.</p>
           </div>
         </div>
       </transition>
@@ -120,19 +120,32 @@
       <div v-if="selectionMode === 'customize'" class="glass rounded-2xl p-8 mb-10 max-w-3xl mx-auto shadow-xl" data-aos="slide-up" data-aos-duration="500">
         <h2 class="text-2xl font-semibold text-center text-green-700 mb-6"><i class="fas fa-sliders-h mr-2"></i>Mode Kustom</h2>
         <form @submit.prevent="handleCustomSubmit">
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div v-for="(value, key) in preferensi" :key="key">
-              <label class="block text-sm font-medium text-gray-800 mb-1 capitalize">{{ key.replace('C', 'Kriteria ') }}</label>
-              <input type="number" min="1" max="5" v-model.number="preferensi[key]" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400">
+          <div class="space-y-6">
+            <div v-for="kriteria in kustomKriteria" :key="kriteria.id_kriteria">
+              <label class="block text-md font-semibold text-gray-800">{{ kriteria.label }}</label>
+              <p class="text-sm text-gray-500 mb-3">Pilih tingkat prioritas dari 1 (Rendah) hingga 5 (Tinggi).</p>
+              <div class="flex flex-wrap items-center -ml-2">
+                <div v-for="n in 5" :key="n" class="flex items-center px-2">
+                  <input :id="`${kriteria.id_kriteria}-${n}`" 
+                         :name="`bobot-${kriteria.id_kriteria}`" 
+                         type="radio" 
+                         :value="n" 
+                         v-model.number="kriteria.bobot" 
+                         class="h-5 w-5 cursor-pointer text-green-600 focus:ring-green-500 border-gray-300">
+                  <label :for="`${kriteria.id_kriteria}-${n}`" class="ml-2 block text-md text-gray-900 cursor-pointer select-none">{{ n }}</label>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="mt-6">
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Waktu Makan</label>
+
+          <div class="mt-8 border-t pt-6">
+            <label class="block text-md font-semibold text-gray-800 mb-2">Waktu Makan</label>
             <select v-model="timing" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="pre_workout">Pre-Workout</option>
               <option value="post_workout">Post-Workout</option>
             </select>
           </div>
+          
           <div class="text-center mt-8">
             <button class="bg-blue-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-blue-700 transition shadow-md">
                 <i class="fas fa-save mr-2"></i>Simpan & Lihat Rekomendasi
@@ -148,8 +161,8 @@
       <div v-if="rekomendasi.length > 0 && !isLoading" data-aos="fade-up" data-aos-offset="200">
         <h2 class="text-2xl font-bold text-green-700 mb-6 mt-12 text-center"><i class="fas fa-fire-alt mr-2"></i>Hasil Rekomendasi</h2>
         <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-          <div v-for="item in rekomendasi" :key="item.id" class="card bg-white rounded-2xl overflow-hidden shadow-lg">
-            <img :src="item.gambar" alt="Makanan" class="w-full h-40 object-cover">
+          <div v-for="item in rekomendasi" :key="item.id_makanan" class="card bg-white rounded-2xl overflow-hidden shadow-lg">
+            <img :src="item.gambar" :alt="item.nama" class="w-full h-40 object-cover">
             <div class="p-4">
               <h3 class="text-xl font-semibold text-green-700">{{ item.nama }}</h3>
               <p class="text-sm text-gray-600 my-2">{{ item.penjelasan }}</p>
@@ -169,7 +182,7 @@
   createApp({
     data() {
       return {
-        selectionMode: null, // "preset" atau "custom"
+        selectionMode: null,
         user: null,
         isLoggedIn: false,
         showMenu: false, 
@@ -177,31 +190,21 @@
         timing: 'pre_workout',
         rekomendasi: [],
         isLoading: false, 
-        preferensi: { "C1": 3, "C2": 3, "C3": 3, "C4": 3, "C5": 3 }
+        kustomKriteria: [
+            { id_kriteria: 1, label: 'Protein', bobot: 3 },
+            { id_kriteria: 2, label: 'Karbohidrat', bobot: 3 },
+            { id_kriteria: 3, label: 'Lemak', bobot: 3 },
+            { id_kriteria: 4, label: 'Serat', bobot: 3 },
+            { id_kriteria: 5, label: 'Kemudahan Mencari', bobot: 3 }
+        ]
       };
     },
     mounted() {
-      this.checkLoginSession();
-      if (this.isLoggedIn) {
-        this.getPreferensi();
-      }
+      this.checkLoginStatus();
       AOS.init({ once: true });
     },
     methods: {
-      resetSelection() {
-        this.selectionMode = null;
-        this.rekomendasi = [];
-      },
-      async handleCustomSubmit() {
-        this.selectionMode = "custom";
-        await this.updatePreferensi();
-        await this.fetchRekomendasi();
-      },
-      async handlePresetSubmit() {
-        this.selectionMode = "preset";
-        await this.fetchRekomendasi();
-      },
-      checkLoginSession() {
+      checkLoginStatus() {
         const token = localStorage.getItem("authToken");
         if (token) {
           this.isLoggedIn = true;
@@ -213,15 +216,29 @@
       logout() {
         localStorage.removeItem("authToken");
         localStorage.removeItem("user");
+        this.isLoggedIn = false;
         window.location.href = "login.html";
       },
-      async fetchRekomendasi() {
+      selectMode(mode) {
         if (!this.isLoggedIn) {
-          alert('Anda harus login terlebih dahulu.');
+          alert('Anda harus login terlebih dahulu untuk mendapatkan rekomendasi.');
           window.location.href = 'login.html';
           return;
         }
-
+        this.selectionMode = mode;
+        if (mode === 'customize') {
+          this.getPreferensi();
+        }
+      },
+      resetSelection() {
+        this.selectionMode = null;
+        this.rekomendasi = [];
+      },
+      async handleCustomSubmit() {
+        await this.updatePreferensi();
+        await this.fetchRekomendasi();
+      },
+      async fetchRekomendasi() {
         this.isLoading = true;
         this.rekomendasi = [];
 
@@ -235,33 +252,41 @@
 
           if (res.data.length === 0) {
             alert('Tidak ada rekomendasi yang cocok ditemukan.');
-            return;
+          } else {
+             // Simpan hasil ke riwayat
+             const hasilSPK = res.data.map((item, index) => ({
+                id_makanan: item.id_makanan,
+                skor_total: item.skor,
+                ranking: index + 1,
+                fase_latihan: this.fase_latihan,
+                waktu_makan: this.timing,
+                mode_penggunaan: this.selectionMode
+             }));
+             await this.simpanHasilRekomendasi(hasilSPK);
           }
-
-          const hasilSPK = res.data.map((item, index) => ({
-            id_makanan: item.id ?? item.id_makanan ?? item.makanan?.id_makanan,
-            skor_total: item.skor,
-            ranking: index + 1,
-            fase_latihan: this.fase_latihan,
-            waktu_makan: this.timing,
-            mode_penggunaan: this.selectionMode ?? "preset" // ✅ default fallback ke preset
-          }));
-
-          console.log("Payload hasilSPK:", hasilSPK);
-
-          await axios.post(`${API_BASE_URL}/api/spk/simpan`, hasilSPK, {
-            headers: {
-              "Authorization": 'Bearer ' + localStorage.getItem('authToken'),
-              "Content-Type": "application/json"
-            }
-          });
-
         } catch (err) {
-          console.error("❌ Error fetching or saving SPK results:", err);
-          alert('❌ Gagal mengambil rekomendasi atau menyimpan hasil.');
+          console.error("Error fetching recommendations:", err);
+          if(err.response && err.response.status === 401) {
+            alert('Sesi Anda telah berakhir. Silakan login kembali.');
+            this.logout();
+          } else {
+            alert('Gagal mengambil rekomendasi. Periksa koneksi Anda.');
+          }
         } finally {
           this.isLoading = false;
         }
+      },
+      async simpanHasilRekomendasi(hasil) {
+          try {
+            await axios.post(`${API_BASE_URL}/api/spk/simpan`, hasil, {
+                headers: {
+                    "Authorization": 'Bearer ' + localStorage.getItem('authToken'),
+                    "Content-Type": "application/json"
+                }
+            });
+          } catch(err) {
+              console.error("Gagal menyimpan hasil rekomendasi:", err);
+          }
       },
       async getPreferensi() {
         if (!this.isLoggedIn) return;
@@ -269,12 +294,14 @@
           const res = await axios.get(`${API_BASE_URL}/api/users/me/preferences`, {
             headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') }
           });
-          const prefsObject = res.data.reduce((acc, item) => {
-            acc['C' + item.id_kriteria] = item.bobot;
-            return acc;
-          }, {});
-          if (Object.keys(prefsObject).length > 0) {
-            this.preferensi = prefsObject;
+          
+          if (res.data && res.data.length > 0) {
+              this.kustomKriteria.forEach(kriteria => {
+                  const preferensiDariServer = res.data.find(p => p.id_kriteria === kriteria.id_kriteria);
+                  if (preferensiDariServer) {
+                      kriteria.bobot = preferensiDariServer.bobot;
+                  }
+              });
           }
         } catch (err) {
           console.error("Error fetching preferences:", err);
@@ -284,9 +311,9 @@
         if (!this.isLoggedIn) return;
         try {
           const payload = {
-            preferences: Object.keys(this.preferensi).map(key => ({
-              id_kriteria: parseInt(key.replace('C', '')),
-              bobot: this.preferensi[key]
+            preferences: this.kustomKriteria.map(k => ({
+              id_kriteria: k.id_kriteria,
+              bobot: k.bobot
             }))
           };
           await axios.put(`${API_BASE_URL}/api/users/me/preferences`, payload, {
@@ -294,12 +321,11 @@
           });
         } catch (err) {
           console.error("Error updating preferences:", err);
-          alert('❌ Gagal memperbarui preferensi');
+          alert('Gagal memperbarui preferensi');
         }
       }
     }
   }).mount('#app')
 </script>
 </body>
-
 </html>
