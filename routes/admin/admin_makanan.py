@@ -9,15 +9,15 @@ from utils.security import get_current_admin
 from schema.makanan_schemas import MakananCreate, Makanan as MakananSchema, MakananOut
 from model.kriteria import Kriteria
 from schema.kriteria_schemas import KriteriaResponse
-from fastapi import APIRouter, Depends, Form, File, UploadFile, HTTPException, status # Pastikan status diimpor
+from fastapi import APIRouter, Depends, Form, File, UploadFile, HTTPException, status 
 
-# HAPUS prefix
+
 router = APIRouter(
     tags=["Admin - Makanan"],
     dependencies=[Depends(get_current_admin)]
 )
 
-# TAMBAHKAN ENDPOINT BARU INI
+
 @router.get("/admin/kriteria/", response_model=List[KriteriaResponse])
 def list_kriteria(db: Session = Depends(get_db)):
     """
@@ -31,20 +31,20 @@ async def add_makanan(
     nama: str = Form(...),
     deskripsi: Optional[str] = Form(None),
     gambar: UploadFile = File(...),
-    nilai_gizi: str = Form('[]') # <-- TAMBAHKAN ini, default ke string array kosong
+    nilai_gizi: str = Form('[]') 
 ):
     makanan_create = MakananCreate(nama=nama, deskripsi=deskripsi)
     # Teruskan nilai_gizi ke controller
     return await Admin.create_makanan(db=db, makanan=makanan_create, gambar=gambar, nilai_gizi_json=nilai_gizi)
 
-# ... (list_makanan tidak berubah) ...
+
 
 @router.put("/admin/makanan/{makanan_id}", response_model=MakananOut)
 async def update_makanan(
     makanan_id: int,
     nama: str = Form(...),
     deskripsi: str = Form(""),
-    nilai_gizi: str = Form('[]'), # <-- TAMBAHKAN ini
+    nilai_gizi: str = Form('[]'), 
     gambar: UploadFile = None,
     db: Session = Depends(get_db)
 ):
@@ -67,7 +67,7 @@ def list_makanan(db: Session = Depends(get_db)):
 def force_delete_makanan_route(
     makanan_id: int,
     db: Session = Depends(get_db),
-    current_admin: dict = Depends(get_current_admin) # Asumsi Anda punya dependensi keamanan
+    current_admin: dict = Depends(get_current_admin) 
 ):
     """
     Endpoint untuk menghapus makanan beserta semua data terkait (force delete).

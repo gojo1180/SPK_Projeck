@@ -35,7 +35,7 @@
     .line-clamp-3 {
       display: -webkit-box;
       -webkit-line-clamp: 3;
-      line-clamp: 3; /* <- tambahan untuk standar CSS (non-webkit) */
+      line-clamp: 3; 
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
@@ -477,8 +477,7 @@ watch: {
               nilaiGizi: Array(this.daftarKriteria.length).fill(null) 
           };
           this.showEditModal = true;
-          // Di sini Anda bisa menambahkan fetch untuk mendapatkan nilai gizi yang sudah ada
-          // (Untuk sekarang kita biarkan kosong agar tidak terlalu kompleks)
+        
       },
       async submitEditMakanan() {
         const formData = new FormData();

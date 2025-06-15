@@ -361,45 +361,45 @@
 </section>
 
 
-<section class="bg-white py-16">
-  <div class="text-center mb-12">
-    <h2 class="text-3xl font-bold">Statistik Pengguna</h2>
-    <p class="text-gray-500 mt-2 max-w-xl mx-auto">Kami terus berkembang dan dipercaya oleh pengguna aktif setiap harinya.</p>
-  </div>
+    <section class="bg-white py-16">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold">Statistik Pengguna</h2>
+        <p class="text-gray-500 mt-2 max-w-xl mx-auto">Kami terus berkembang dan dipercaya oleh pengguna aktif setiap harinya.</p>
+      </div>
 
-  <div class="flex flex-wrap justify-center gap-8 px-6">
-    <div 
-      class="group stat-card w-64 h-44 bg-green-50 rounded-2xl shadow-md flex flex-col justify-center items-center transition duration-300 transform hover:scale-105 hover:bg-green-600 cursor-pointer"
-      data-aos="fade-up"
-      data-aos-delay="100"
-      data-target="312"
-    >
-      <h4 class="stat-number text-4xl font-bold text-green-600 transition duration-300 group-hover:text-white">0</h4>
-      <p class="mt-2 text-gray-600 transition duration-300 group-hover:text-white">Pengguna Aktif</p>
-    </div>
+      <div class="flex flex-wrap justify-center gap-8 px-6">
+        <div 
+          class="group stat-card w-64 h-44 bg-green-50 rounded-2xl shadow-md flex flex-col justify-center items-center transition duration-300 transform hover:scale-105 hover:bg-green-600 cursor-pointer"
+          data-aos="fade-up"
+          data-aos-delay="100"
+          :data-target="stats.pengguna_aktif"
+        >
+          <h4 class="stat-number text-4xl font-bold text-green-600 transition duration-300 group-hover:text-white">0</h4>
+          <p class="mt-2 text-gray-600 transition duration-300 group-hover:text-white">Pengguna Aktif</p>
+        </div>
 
-    <div 
-      class="group stat-card w-64 h-44 bg-green-50 rounded-2xl shadow-md flex flex-col justify-center items-center transition duration-300 transform hover:scale-105 hover:bg-green-600 cursor-pointer"
-      data-aos="fade-up"
-      data-aos-delay="200"
-      data-target="128"
-    >
-      <h4 class="stat-number text-4xl font-bold text-green-600 transition duration-300 group-hover:text-white">0</h4>
-      <p class="mt-2 text-gray-600 transition duration-300 group-hover:text-white">Rekomendasi Makanan</p>
-    </div>
+        <div 
+          class="group stat-card w-64 h-44 bg-green-50 rounded-2xl shadow-md flex flex-col justify-center items-center transition duration-300 transform hover:scale-105 hover:bg-green-600 cursor-pointer"
+          data-aos="fade-up"
+          data-aos-delay="200"
+          :data-target="stats.rekomendasi_makanan"
+        >
+          <h4 class="stat-number text-4xl font-bold text-green-600 transition duration-300 group-hover:text-white">0</h4>
+          <p class="mt-2 text-gray-600 transition duration-300 group-hover:text-white">Rekomendasi Makanan</p>
+        </div>
 
-    <div 
-      class="group stat-card w-64 h-44 bg-green-50 rounded-2xl shadow-md flex flex-col justify-center items-center transition duration-300 transform hover:scale-105 hover:bg-green-600 cursor-pointer"
-      data-aos="fade-up"
-      data-aos-delay="300"
-      data-target="96"
-      data-suffix="%"
-    >
-      <h4 class="stat-number text-4xl font-bold text-green-600 transition duration-300 group-hover:text-white">0</h4>
-      <p class="mt-2 text-gray-600 transition duration-300 group-hover:text-white">Tingkat Kepuasan</p>
-    </div>
-  </div>
-</section>
+        <div 
+          class="group stat-card w-64 h-44 bg-green-50 rounded-2xl shadow-md flex flex-col justify-center items-center transition duration-300 transform hover:scale-105 hover:bg-green-600 cursor-pointer"
+          data-aos="fade-up"
+          data-aos-delay="300"
+          data-target="96"
+          data-suffix="%"
+        >
+          <h4 class="stat-number text-4xl font-bold text-green-600 transition duration-300 group-hover:text-white">0</h4>
+          <p class="mt-2 text-gray-600 transition duration-300 group-hover:text-white">Tingkat Kepuasan</p>
+        </div>
+      </div>
+    </section>
 
 <footer class="bg-white text-gray-800 py-10 shadow-md border-t border-gray-200">
   <div class="container mx-auto px-6 max-w-7xl">
@@ -468,7 +468,11 @@
         user: null,
         isLoggedIn: false,
         historiGrouped: {},
-        accordionState: {}  // untuk toggle expand/collapse tiap grup
+        accordionState: {}, 
+              stats: {
+          pengguna_aktif: 0,
+          rekomendasi_makanan: 0
+        } // untuk toggle expand/collapse tiap grup
       };
     },
     mounted() {
@@ -476,8 +480,30 @@
       if (this.isLoggedIn) {
         this.fetchHistori();
       }
+          // Panggil fungsi untuk mengambil statistik saat komponen dimuat
+      this.fetchStats();
     },
+
     methods: {
+
+      async fetchStats() {
+        try {
+          const response = await fetch("http://localhost:8000/api/stats");
+          if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          this.stats.pengguna_aktif = data.pengguna_aktif;
+          this.stats.rekomendasi_makanan = data.rekomendasi_makanan;
+        } catch (error) {
+          console.error("Gagal mengambil statistik:", error);
+          // Menggunakan nilai fallback jika API gagal
+          this.stats.pengguna_aktif = 312;
+          this.stats.rekomendasi_makanan = 128;
+        }
+      },
+
+
       checkLoginSession() {
         const token = localStorage.getItem("authToken");
         if (token) {
@@ -503,14 +529,14 @@
           });
           const data = await response.json();
           
-          // === PERBAIKAN DIMULAI DI SINI ===
+      
           // Loop melalui setiap grup dalam data dan urutkan item di dalamnya berdasarkan ranking
           for (const key in data) {
             if (data.hasOwnProperty(key) && Array.isArray(data[key])) {
               data[key].sort((a, b) => a.ranking - b.ranking);
             }
           }
-          // === PERBAIKAN SELESAI ===
+          
 
           this.historiGrouped = data;
 
@@ -544,7 +570,7 @@
          hour: "2-digit",
          minute: "2-digit"
        });
-       // Mengganti underscore dengan spasi dan membuat huruf kapital
+       
        const formattedWaktu = waktu.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase());
        const formattedFase = fase.charAt(0).toUpperCase() + fase.slice(1);
 
