@@ -2,7 +2,7 @@
 from sqlalchemy import Column, Integer, String
 from utils.DB import Base
 
-
+# gg
 class Admin(Base): 
     __tablename__ = "admin"
     id_admin = Column(Integer, primary_key=True, index=True)
