@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: spk_projeck_nginx
+    ports:
+      # Memetakan port 80 di host ke port 80 di container Nginx
+      # Ini adalah satu-satunya port yang perlu kita buka ke publik
+      - "80:80"
+    volumes:
+      # Memasang file konfigurasi Nginx yang kita buat
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      # Memasang folder static dari proyek agar bisa disajikan oleh Nginx
+      - ./static:/var/www/static
+    depends_on:
+      - backend
+    restart: always
+
+  backend:
+    build: .
+    container_name: spk_projeck_backend
+    # 'ports' DIHAPUS dari sini karena akses akan melalui Nginx
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    restart: always
