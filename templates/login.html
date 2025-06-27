@@ -37,8 +37,10 @@
   </div>
 
   <!-- Tambahkan Vue -->
- <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
-<script>
+<script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+<script type="module">
+  import { API_BASE_URL } from "./apibaseurl.js";
+
   const { createApp } = Vue;
 
   createApp({
@@ -55,7 +57,7 @@
         formData.append("password", this.password);
 
         try {
-          const response = await fetch("http://localhost:8000/api/login", {
+          const response = await fetch(`${API_BASE_URL}/api/login`, {
             method: "POST",
             headers: {
               "Content-Type": "application/x-www-form-urlencoded"
@@ -71,19 +73,20 @@
             localStorage.setItem("user", JSON.stringify(data.user));
 
             alert("Login berhasil!");
-            window.location.href = "index.html"; // Arahkan ke halaman profile
+            window.location.href = "index.html"; // Ubah sesuai halaman tujuan setelah login
           } else {
             alert("Login gagal: Data tidak lengkap.");
             console.warn("Data yang diterima:", data);
           }
         } catch (error) {
           console.error("Terjadi error saat login:", error);
-          alert("Terjadi kesalahan jaringan.");
+          alert("Terjadi kesalahan jaringan. Pastikan server API bisa diakses.");
         }
       }
     }
   }).mount("#app");
 </script>
+
 
 
 </body>

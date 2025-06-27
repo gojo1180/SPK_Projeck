@@ -18,3 +18,8 @@ httpx
 cachetools
 slowapi
 starlette
+pydantic[email]
+python-jose
+python-multipart
+requests
+
